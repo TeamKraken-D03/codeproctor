@@ -31,3 +31,10 @@ export enum userRole {
   ADMIN = "admin",
   FACULTY = "manager",
 }
+
+export type problem = {
+  id: number
+  title: string
+  difficulty: string
+  isSolved: boolean
+}

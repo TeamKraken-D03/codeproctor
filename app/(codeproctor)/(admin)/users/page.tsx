@@ -1,9 +1,9 @@
 "use client";
 import { user, userRole } from "@/types/types";
-import { columns } from "./columns";
-import { DataTable } from "./data-table";
+import { columns } from "./_components/columns";
 import { useEffect, useState } from "react";
 import { userContext } from "./context";
+import { DataTable } from "@/components/ui/data-table";
 
 export default function UsersPage() {
   const [data, setData] = useState<user[]>([]);

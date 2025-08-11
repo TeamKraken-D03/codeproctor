@@ -1,3 +1,7 @@
+import IDE from "@/components/IDE";
+
 export default function Page(){
-    return <h1>Solve problem with code editor</h1>
+    return <>
+    <IDE />
+    </>
 }
