@@ -20,15 +20,9 @@ import {
 } from "@/components/ui/dialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
-import { userContext } from "../context";
+import { userContext } from "./context";
 import { useContext } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const columns: ColumnDef<user>[] = [
   {
@@ -95,9 +89,7 @@ export const columns: ColumnDef<user>[] = [
                   Select a role for {row.original.name}
                 </DialogDescription>
               </DialogHeader>
-              <Select
-                onValueChange={(value) => assignRole(row.original, value)}
-              >
+              <Select onValueChange={(value) => assignRole(row.original,value)}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Roles" />
                 </SelectTrigger>
