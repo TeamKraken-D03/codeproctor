@@ -50,11 +50,11 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user?.email) {
         const userData =
-          await sql`SELECT id, roles FROM users WHERE email = ${user.email}`;
+          await sql`SELECT id, role FROM users WHERE email = ${user.email}`;
         console.log(userData);
         if (userData.length > 0) {
           token.userId = userData[0].id;
-          token.userRole = userData[0].roles;
+          token.userRole = userData[0].role;
         }
       }
       return token;

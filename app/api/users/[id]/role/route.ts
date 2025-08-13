@@ -7,12 +7,10 @@ export async function POST(
 ) {
     try {
         const body = await req.json();
-
-
         const { newRole } = body;
 
         await sql`UPDATE users
-            SET roles = ${newRole}
+            SET role = ${newRole}
             WHERE id = ${id}`;
 
         return NextResponse.json(   

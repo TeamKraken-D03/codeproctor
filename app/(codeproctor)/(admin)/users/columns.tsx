@@ -38,8 +38,8 @@ export const columns: ColumnDef<user>[] = [
     header: "Email",
   },
   {
-    accessorKey: "roles",
-    header: "Roles",
+    accessorKey: "role",
+    header: "Role",
   },
   {
     id: "actions",
@@ -91,7 +91,7 @@ export const columns: ColumnDef<user>[] = [
               </DialogHeader>
               <Select onValueChange={(value) => assignRole(row.original,value)}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Roles" />
+                  <SelectValue placeholder="Role" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Admin</SelectItem>
