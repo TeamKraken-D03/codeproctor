@@ -1,13 +1,15 @@
 "use client";
 
 import { user, userRole } from "@/types/types";
-import { MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -22,27 +24,78 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
 import { userContext } from "./context";
 import { useContext } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const columns: ColumnDef<user>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "id",
     header: "Id",
   },
   {
     accessorKey: "name",
-    header: "Name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Email
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
     accessorKey: "role",
     header: "Role",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("role")}</div>,
   },
   {
     id: "actions",
+    enableHiding: false,
     cell: ({ row }) => {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
       const context = useContext(userContext);
@@ -75,8 +128,20 @@ export const columns: ColumnDef<user>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(row.original.id)}
+              >
+                Copy user ID
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleAssignRole}>
                 Assign Role
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleAssignRole}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleAssignRole}>
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -89,7 +154,9 @@ export const columns: ColumnDef<user>[] = [
                   Select a role for {row.original.name}
                 </DialogDescription>
               </DialogHeader>
-              <Select onValueChange={(value) => assignRole(row.original,value)}>
+              <Select
+                onValueChange={(value) => assignRole(row.original, value)}
+              >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
