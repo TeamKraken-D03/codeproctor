@@ -2,18 +2,21 @@
 import { Code, LogOut } from "lucide-react";
 import { signOut, useSession, signIn } from "next-auth/react";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 export function Header() {
   const { data: session } = useSession();
 
   return (
     <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div className="px-2 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
             <Code className="w-6 h-6 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">CodeProctor</h1>
+          <Link href={"/"}>
+            <h1 className="text-2xl font-bold text-foreground">CodeProctor</h1>
+          </Link>
         </div>
 
         {/* Conditional User Section */}
@@ -34,7 +37,11 @@ export function Header() {
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => signOut()}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => signOut({ callbackUrl: "/" })}
+            >
               <LogOut className="w-4 h-4" />
               Sign out
             </Button>

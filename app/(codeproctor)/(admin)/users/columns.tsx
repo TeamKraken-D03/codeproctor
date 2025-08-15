@@ -1,4 +1,4 @@
-import { user, userRole } from "@/types/types";
+import { user} from "@/types/types";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
