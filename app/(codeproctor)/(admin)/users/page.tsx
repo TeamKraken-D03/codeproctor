@@ -12,7 +12,6 @@ export default function UsersPage() {
   }, []);
 
   async function getData(): Promise<user[]> {
-
     try {
       const users = await fetch(`/api/users`);
 
@@ -37,9 +36,11 @@ export default function UsersPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">User Management</h1>
-      <div className="rounded-lg shadow">
-        <DataTable columns={columns} data={data} searchColumn="email"/>
+      <h1 className="text-3xl font-bold mb-6 text-foreground">
+        User Management
+      </h1>
+      <div className="rounded-lg border bg-card shadow-sm">
+        <DataTable columns={columns} data={data} searchColumn="email" />
       </div>
     </div>
   );

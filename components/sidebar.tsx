@@ -5,11 +5,15 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
-  Users, Home,
-  BookOpen, GraduationCap,
-  Building, School,
-  Presentation
+  Users,
+  Home,
+  BookOpen,
+  GraduationCap,
+  Building,
+  School,
+  Presentation,
 } from "lucide-react";
+import { ModeToggle } from "./mode-toggle";
 
 interface SidebarItem {
   label: string;
@@ -31,23 +35,23 @@ const sidebarItems: SidebarItem[] = [
   {
     label: "Problems",
     href: "/problems",
-    icon: BookOpen
+    icon: BookOpen,
   },
   {
     label: "Semesters",
     href: "/semesters",
-    icon: GraduationCap
+    icon: GraduationCap,
   },
   {
     label: "Departments",
     href: "/departments",
-    icon: Building
+    icon: Building,
   },
   {
     label: "Sections",
     href: "/sections",
-    icon: Presentation
-  }
+    icon: Presentation,
+  },
 ];
 
 export default function Sidebar() {
@@ -56,13 +60,13 @@ export default function Sidebar() {
 
   if (status === "loading") {
     return (
-      <div className="w-64 bg-white border-r border-gray-200 h-screen">
+      <div className="w-64 bg-card border-r border-border h-screen">
         <div className="p-4">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded mb-4"></div>
+            <div className="h-8 bg-muted rounded mb-4"></div>
             <div className="space-y-2">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-10 bg-gray-200 rounded"></div>
+                <div key={i} className="h-10 bg-muted rounded"></div>
               ))}
             </div>
           </div>
@@ -72,10 +76,11 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col">
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-xl font-bold text-gray-800">CodeProctor</h2>
-        <p className="text-sm text-gray-600">Dashboard</p>
+    <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
+      <div className="p-4 border-b border-border">
+        <h2 className="text-xl font-bold text-card-foreground flex items-center gap-2">
+          CodeProctor <ModeToggle />
+        </h2>
       </div>
 
       <nav className="flex-1 p-4">
@@ -92,8 +97,8 @@ export default function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-blue-50 text-blue-700 border border-blue-200"
-                      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -105,13 +110,13 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center gap-3 text-sm text-gray-600">
-          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+      <div className="p-4 border-t border-border">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground">
             {session?.user?.name?.charAt(0).toUpperCase() || "U"}
           </div>
           <div>
-            <p className="font-medium text-gray-900">
+            <p className="font-medium text-card-foreground">
               {session?.user?.name || "User"}
             </p>
             <p className="text-xs">

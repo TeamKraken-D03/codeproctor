@@ -24,8 +24,10 @@ export default function DepartmentsPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Department Management</h1>
-      <div className="rounded-lg shadow">
+      <h1 className="text-3xl font-bold mb-6 text-foreground">
+        Department Management
+      </h1>
+      <div className="rounded-lg border bg-card shadow-sm">
         <DataTable
           columns={createDepartmentColumns(refetchData)}
           data={data}
