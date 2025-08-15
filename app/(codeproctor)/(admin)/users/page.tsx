@@ -1,5 +1,5 @@
 "use client";
-import { user, userRole } from "@/types/types";
+import { user } from "@/types/types";
 import { createColumns } from "./columns";
 import { DataTable } from "../../../../components/data-table";
 import { useEffect, useState } from "react";

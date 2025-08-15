@@ -26,8 +26,13 @@ export type user = {
     role: string,
 }
 
-export enum userRole {
-  LEARNER = "learner",
-  ADMIN = "admin",
-  FACULTY = "manager",
+export type semester = {
+  id: string,
+  name: string,
+  year: string,
+}
+
+export type department = {
+  id: string,
+  name: string
 }

@@ -5,16 +5,10 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
-  Users,
-  Code,
-  BarChart3,
-  Settings,
-  Home,
-  BookOpen,
-  Trophy,
-  FileText,
-  Plus,
-  Eye,
+  Users, Home,
+  BookOpen, GraduationCap,
+  Building, School,
+  Presentation
 } from "lucide-react";
 
 interface SidebarItem {
@@ -38,6 +32,21 @@ const sidebarItems: SidebarItem[] = [
     label: "Problems",
     href: "/problems",
     icon: BookOpen
+  },
+  {
+    label: "Semesters",
+    href: "/semesters",
+    icon: GraduationCap
+  },
+  {
+    label: "Departments",
+    href: "/departments",
+    icon: Building
+  },
+  {
+    label: "Sections",
+    href: "/sections",
+    icon: Presentation
   }
 ];
 
