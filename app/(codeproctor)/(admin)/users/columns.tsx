@@ -1,5 +1,3 @@
-"use client";
-
 import { user, userRole } from "@/types/types";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,12 +16,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
-import { userContext } from "./context";
-import { useContext } from "react";
 import {
   Select,
   SelectContent,
@@ -32,7 +27,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const columns: ColumnDef<user>[] = [
+export const createColumns = (
+  refetchData: () => Promise<void>
+): ColumnDef<user>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -57,7 +54,17 @@ export const columns: ColumnDef<user>[] = [
   },
   {
     accessorKey: "id",
-    header: "Id",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Id
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "name",
@@ -90,7 +97,17 @@ export const columns: ColumnDef<user>[] = [
   },
   {
     accessorKey: "role",
-    header: "Role",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Role
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => <div className="capitalize">{row.getValue("role")}</div>,
   },
   {
@@ -98,14 +115,11 @@ export const columns: ColumnDef<user>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
-      const context = useContext(userContext);
-      if (!context) {
-        throw new Error("useContext must be used within userContext.Provider");
-      }
-      const { getData } = context;
+
       const handleAssignRole = () => {
         setIsDialogOpen(true);
       };
+
       async function assignRole(row: user, newRole: string) {
         const res = await fetch(`/api/users/${row.id}/role`, {
           method: "POST",
@@ -115,7 +129,7 @@ export const columns: ColumnDef<user>[] = [
           body: JSON.stringify({ newRole: newRole }),
         });
         setIsDialogOpen(false);
-        getData();
+        await refetchData();
       }
       return (
         <>

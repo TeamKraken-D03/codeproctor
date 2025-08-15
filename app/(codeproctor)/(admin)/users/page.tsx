@@ -1,17 +1,18 @@
 "use client";
 import { user, userRole } from "@/types/types";
-import { columns } from "./columns";
+import { createColumns } from "./columns";
 import { DataTable } from "../../../../components/data-table";
 import { useEffect, useState } from "react";
-import { userContext } from "./context";
 
 export default function UsersPage() {
   const [data, setData] = useState<user[]>([]);
+
   useEffect(() => {
     getData();
   }, []);
+
   async function getData(): Promise<user[]> {
-    // Fetch data from your API here.
+
     try {
       const users = await fetch(`/api/users`);
 
@@ -28,14 +29,18 @@ export default function UsersPage() {
     }
   }
 
+  const refetchData = async (): Promise<void> => {
+    await getData();
+  };
+
+  const columns = createColumns(refetchData);
+
   return (
-    <userContext.Provider value={{ getData }}>
-      <div>
-        <h1 className="text-3xl font-bold mb-6">User Management</h1>
-        <div className="rounded-lg shadow">
-          <DataTable columns={columns} data={data} />
-        </div>
+    <div>
+      <h1 className="text-3xl font-bold mb-6">User Management</h1>
+      <div className="rounded-lg shadow">
+        <DataTable columns={columns} data={data} searchColumn="email"/>
       </div>
-    </userContext.Provider>
+    </div>
   );
 }
