@@ -23,7 +23,7 @@ export default function Page() {
         <DataTable
           columns={createSectionColumns(refetchData)}
           data={sections}
-          searchColumn="name"
+          searchColumn="section_name"
         />
       </div>
     </div>

@@ -15,7 +15,10 @@ export async function createSection(newSection: section){
 
 export async function getAllSections(){
     try{
-        const sections = await sql`SELECT DISTINCT name, semesterid, departmentid, isactive FROM sections`;
+        const sections = await sql`SELECT DISTINCT sections.name as section_name, semesters.name as semester_name, departments.name as department_name, sections.isactive as is_active 
+        FROM sections
+        INNER JOIN semesters ON sections.semesterid = semesters.id
+        INNER JOIN departments ON sections.departmentid = departments.id`;
         return {status: true, data: sections};
     }
     catch(e){

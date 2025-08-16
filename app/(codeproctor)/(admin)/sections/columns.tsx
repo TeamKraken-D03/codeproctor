@@ -47,63 +47,49 @@ export const createSectionColumns = (
     enableHiding: false,
   },
   {
-    accessorKey: "id",
+    accessorKey: "section_name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Id
+          Section 
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "name",
+    accessorKey: "semester_name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Semester 
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "semesterid",
+    accessorKey: "department_name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Semester Id
+          Department 
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "departmentid",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Department Id
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "isActive",
+    accessorKey: "is_active",
     header: ({ column }) => {
       return (
         <Button
@@ -128,12 +114,7 @@ export const createSectionColumns = (
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-      const handleAssignRole = () => {
-        setIsDialogOpen(true);
-      };
-
+  
       return (
         <>
           <DropdownMenu>
