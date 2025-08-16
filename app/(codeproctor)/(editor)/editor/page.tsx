@@ -14,7 +14,7 @@ import { ArrowBigDownIcon, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 export default function editor() {
-  const [language, setLanuage] = useState<string>("c++");
+  const [language, setLanuage] = useState<string>("javascript");
   return (
     <div>
       <div className="flex justify-between">
@@ -52,6 +52,7 @@ export default function editor() {
         height="80vh"
         language={language}
         defaultValue="// some comment"
+        defaultLanguage="javascript"
         theme="vs-dark"
         options={
           {

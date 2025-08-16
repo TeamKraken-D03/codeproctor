@@ -7,7 +7,7 @@ declare module "next-auth" {
       name?: string | null
       email?: string | null
       image?: string | null
-      userRole?: string | null
+      role?: string | null
     }
   }
 }
@@ -35,4 +35,13 @@ export type semester = {
 export type department = {
   id: string,
   name: string
+}
+
+export type section = {
+  id: string
+  name: string
+  userid: string
+  semesterid: string
+  departmentid: string
+  isactive: boolean
 }

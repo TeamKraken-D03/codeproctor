@@ -5,13 +5,14 @@ import { Button } from "./ui/button";
 import { SidebarTrigger } from "./ui/sidebar";
 import Link from "next/link";
 
-export function Header() {
+export function AppHeader() {
   const { data: session } = useSession();
 
   return (
     <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="px-2 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-3">
+          <SidebarTrigger />
           <Code className="w-6 h-6 text-primary" />
           <Link href={"/"}>
             <h1 className="text-2xl font-bold text-foreground">CodeProctor</h1>

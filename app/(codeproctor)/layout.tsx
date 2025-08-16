@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Header } from "@/components/header";
 import AppSidebar from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppHeader } from "@/components/app-header";
 
 interface LayoutProps {
   children: ReactNode;
@@ -9,18 +10,14 @@ interface LayoutProps {
 
 export default function CodeProctorLayout({ children }: LayoutProps) {
   return (
-    <>
-      {/* <Header /> */}
-      <Header />
-      <SidebarProvider>
-        <div className="flex h-screen bg-background">
-          <AppSidebar />
-          <main className="flex-1 overflow-auto">
-            <SidebarTrigger />
-            <div className="container mx-auto p-6">{children}</div>
-          </main>
-        </div>
-      </SidebarProvider>
-    </>
+    <SidebarProvider>
+      <AppSidebar />
+      <div className="flex flex-1 flex-col">
+        <AppHeader />
+        <main className="flex flex-1 flex-col gap-6 p-4 lg:gap-6 lg:p-6">
+          {children}
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }
