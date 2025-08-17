@@ -11,10 +11,3 @@ const sql = postgres(connection_string);
 
 export default sql;
 
-
-
-
-
-
-
-

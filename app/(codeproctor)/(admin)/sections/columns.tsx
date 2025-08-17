@@ -1,17 +1,13 @@
-import { department } from "@/types/types";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
-import { useState } from "react";
 
 const handleDeleteSection = () => {
   console.log("delete");
@@ -21,9 +17,15 @@ const handleEditSection = () => {
   console.log("Edit");
 };
 
+interface getSectionType{
+  section_name: string
+  semester_name: string
+  department_name: string
+}
+
 export const createSectionColumns = (
   refetchData: () => Promise<void>
-): ColumnDef<department>[] => [
+): ColumnDef<getSectionType>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -89,28 +91,6 @@ export const createSectionColumns = (
     },
   },
   {
-    accessorKey: "is_active",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Is Active
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({row}) => {
-      const isActive = row.getValue("isActive");
-      return (
-        <span className={isActive ? "text-green-500" : "text-red-500"}>
-          {isActive ? "Yes" : "No"}
-        </span>
-      );
-    }
-  },
-  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
@@ -126,12 +106,6 @@ export const createSectionColumns = (
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(row.original.id)}
-              >
-                Copy department ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleEditSection}>
                 Edit
               </DropdownMenuItem>

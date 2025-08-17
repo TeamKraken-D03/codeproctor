@@ -1,10 +1,16 @@
 import sql from "@/lib/db";
 import { section } from "@/types/types";
 
-export async function createSection(newSection: section){
+export interface createSectionType{
+    name: string;
+    semesterid: string;
+    departmentid: string;
+}
+
+export async function createSection(newSection: createSectionType){
     try{
-        await sql`INSERT INTO sections
-        VALUES(${newSection.name}, ${newSection.userid}, ${newSection.semesterid}, ${newSection.departmentid}, ${newSection.isactive})`
+        await sql`INSERT INTO sections (name, semesterid, departmentid)
+        VALUES(${newSection.name}, ${newSection.semesterid}, ${newSection.departmentid})`
         return true;
     }
     catch(e){
