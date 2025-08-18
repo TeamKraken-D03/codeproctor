@@ -1,8 +1,8 @@
 "use client";
 import { user } from "@/types/types";
 import { createColumns } from "./columns";
-import { DataTable } from "../../../../components/data-table";
 import { useEffect, useState } from "react";
+import { DataTable } from "@/components/data-table";
 
 export default function UsersPage() {
   const [data, setData] = useState<user[]>([]);
@@ -39,9 +39,9 @@ export default function UsersPage() {
       <h1 className="text-3xl font-bold mb-6 text-foreground">
         User Management
       </h1>
-      <div className="rounded-lg border bg-card shadow-sm">
-        <DataTable columns={columns} data={data} searchColumn="email" />
-      </div>
+        <div className="rounded-lg border bg-card shadow-sm">
+          <DataTable columns={columns} data={data} searchColumn="email" />
+        </div>
     </div>
   );
 }
