@@ -14,16 +14,20 @@ export interface createProblem {
 }
 
 export async function createTestCase(newTestCase: testCase) {
-    
+    const tags = newTestCase.tags;
+    for (const tag of tags) {
+        sql`INSERT INTO testcases (input, output, tagid) VALUES (${newTestCase.input}, ${newTestCase.output}, ${tag})`;
+    }
 }
 
 
 export function createProblem(newProblem: createProblem){
-
+    const tags = newProblem.tags;
+    const testCases = newProblem.testCases;
 }
 
 export function getTestCases(){
-
+    
 }
 
 export function getTags(){
