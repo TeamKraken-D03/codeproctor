@@ -6,20 +6,55 @@ import { useEffect, useState } from "react";
 
 export default function DepartmentsPage() {
   const [data, setData] = useState<department[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [sorting, setSorting] = useState<any[]>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [totalRows, setTotalRows] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [pagination, sorting, globalFilter]);
 
-  async function getData(): Promise<department[]> {
-    const departments = await fetch("/api/departments", { method: "GET" });
-    const res = await departments.json();
-    setData(res);
-    return res;
+  async function getData(): Promise<void> {
+    setLoading(true);
+    try {
+      const sortBy = sorting.length > 0 ? sorting[0].id : "id";
+      const sortOrder = sorting.length > 0 && sorting[0].desc ? "desc" : "asc";
+      
+      const params = new URLSearchParams({
+        page: (pagination.pageIndex + 1).toString(),
+        pageSize: pagination.pageSize.toString(),
+        search: globalFilter,
+        sortBy,
+        sortOrder,
+      });
+
+      const departments = await fetch(`/api/departments?${params.toString()}`);
+
+      if (!departments.ok) {
+        throw new Error("Failed to fetch departments");
+      }
+      
+      const res = await departments.json();
+      setData(res.data);
+      setTotalRows(res.total);
+      setTotalPages(res.totalPages);
+      console.log(res);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  async function refetchData() {
-    getData();
+  async function refetchData(): Promise<void> {
+    await getData();
   }
 
   return (
@@ -32,6 +67,20 @@ export default function DepartmentsPage() {
           columns={createDepartmentColumns(refetchData)}
           data={data}
           searchColumn="name"
+          manualPagination={true}
+          manualSorting={true}
+          manualFiltering={true}
+          pageCount={totalPages}
+          rowCount={totalRows}
+          state={{
+            pagination,
+            sorting,
+            globalFilter,
+          }}
+          onPaginationChange={setPagination}
+          onSortingChange={setSorting}
+          onGlobalFilterChange={setGlobalFilter}
+          loading={loading}
         />
       </div>
     </div>

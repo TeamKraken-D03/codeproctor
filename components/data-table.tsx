@@ -36,12 +36,37 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchColumn?: string; // Optional — which column to filter
+  // Server-side props
+  manualPagination?: boolean;
+  manualSorting?: boolean; 
+  manualFiltering?: boolean;
+  pageCount?: number;
+  rowCount?: number;
+  state?: {
+    pagination?: any;
+    sorting?: any;
+    globalFilter?: any;
+  };
+  onPaginationChange?: (pagination: any) => void;
+  onSortingChange?: (sorting: any) => void;
+  onGlobalFilterChange?: (filter: string) => void;
+  loading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   searchColumn,
+  manualPagination = false,
+  manualSorting = false,
+  manualFiltering = false,
+  pageCount = -1,
+  rowCount = 0,
+  state,
+  onPaginationChange,
+  onSortingChange,
+  onGlobalFilterChange,
+  loading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -51,20 +76,26 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
+    pageCount: manualPagination ? pageCount : undefined,
+    rowCount: manualPagination ? rowCount : undefined,
+    state: state || {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
     },
+    onSortingChange: onSortingChange || setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onPaginationChange: onPaginationChange,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: manualPagination ? undefined : getPaginationRowModel(),
+    getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
+    getFilteredRowModel: manualFiltering ? undefined : getFilteredRowModel(),
+    manualPagination,
+    manualSorting,
+    manualFiltering,
   });
 
   return (
@@ -72,11 +103,19 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center py-4">
         {searchColumn && (
           <Input
-            placeholder={`Search Section...`}
-            value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn(searchColumn)?.setFilterValue(event.target.value)
+            placeholder={`Search users...`}
+            value={
+              onGlobalFilterChange && state?.globalFilter !== undefined
+                ? state.globalFilter
+                : (table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""
             }
+            onChange={(event) => {
+              if (onGlobalFilterChange) {
+                onGlobalFilterChange(event.target.value);
+              } else {
+                table.getColumn(searchColumn)?.setFilterValue(event.target.value);
+              }
+            }}
             className="max-w-sm"
           />
         )}
@@ -135,7 +174,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  {loading ? "Loading..." : "No results."}
                 </TableCell>
               </TableRow>
             )}
