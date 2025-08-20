@@ -6,25 +6,50 @@ import { DataTable } from "@/components/data-table";
 
 export default function UsersPage() {
   const [data, setData] = useState<user[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [sorting, setSorting] = useState<any[]>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [totalRows, setTotalRows] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [pagination, sorting, globalFilter]);
 
-  async function getData(): Promise<user[]> {
+  async function getData(): Promise<void> {
+    setLoading(true);
     try {
-      const users = await fetch(`/api/users`);
+      const sortBy = sorting.length > 0 ? sorting[0].id : "id";
+      const sortOrder = sorting.length > 0 && sorting[0].desc ? "desc" : "asc";
+      
+      const params = new URLSearchParams({
+        page: (pagination.pageIndex + 1).toString(),
+        pageSize: pagination.pageSize.toString(),
+        search: globalFilter,
+        sortBy,
+        sortOrder,
+      });
+
+      const users = await fetch(`/api/users?${params.toString()}`);
 
       if (!users.ok) {
         throw new Error("Failed to fetch users");
       }
+      
       const res = await users.json();
-      setData(res);
+      setData(res.data);
+      setTotalRows(res.total);
+      setTotalPages(res.totalPages);
       console.log(res);
-      return res;
     } catch (error) {
       console.error("Error fetching users:", error);
-      return [];
+      setData([]);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -39,9 +64,27 @@ export default function UsersPage() {
       <h1 className="text-3xl font-bold mb-6 text-foreground">
         User Management
       </h1>
-        <div className="rounded-lg border bg-card shadow-sm">
-          <DataTable columns={columns} data={data} searchColumn="email" />
-        </div>
+      <div className="rounded-lg border bg-card shadow-sm">
+        <DataTable 
+          columns={columns} 
+          data={data} 
+          searchColumn="email"
+          manualPagination={true}
+          manualSorting={true}
+          manualFiltering={true}
+          pageCount={totalPages}
+          rowCount={totalRows}
+          state={{
+            pagination,
+            sorting,
+            globalFilter,
+          }}
+          onPaginationChange={setPagination}
+          onSortingChange={setSorting}
+          onGlobalFilterChange={setGlobalFilter}
+          loading={loading}
+        />
+      </div>
     </div>
   );
 }

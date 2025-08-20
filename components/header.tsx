@@ -23,7 +23,7 @@ export function Header() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
               <img
-                src={session.user?.image || ""}
+                src={session.user?.image || "/image.png"}
                 alt="Profile"
                 className="w-9 h-9 rounded-full ring-2 ring-border"
               />
