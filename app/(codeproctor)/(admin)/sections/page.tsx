@@ -23,6 +23,16 @@ import { createSectionType } from "@/repository/section.repository";
 
 export default function Page() {
   const [sections, setSections] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [sorting, setSorting] = useState<any[]>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [totalRows, setTotalRows] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  
   const [openDialog, setOpenDialog] = useState(false);
   const [departments, setDepartments] = useState<department[]>([]);
   const [semesters, setSemesters] = useState<semester[]>([]);
@@ -32,12 +42,39 @@ export default function Page() {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [pagination, sorting, globalFilter]);
 
-  async function getData() {
-    const response = await fetch("/api/sections");
-    const data = await response.json();
-    setSections(data.data);
+  async function getData(): Promise<void> {
+    setLoading(true);
+    try {
+      const sortBy = sorting.length > 0 ? sorting[0].id : "section_name";
+      const sortOrder = sorting.length > 0 && sorting[0].desc ? "desc" : "asc";
+      
+      const params = new URLSearchParams({
+        page: (pagination.pageIndex + 1).toString(),
+        pageSize: pagination.pageSize.toString(),
+        search: globalFilter,
+        sortBy,
+        sortOrder,
+      });
+
+      const response = await fetch(`/api/sections?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch sections");
+      }
+      
+      const res = await response.json();
+      setSections(res.data);
+      setTotalRows(res.total);
+      setTotalPages(res.totalPages);
+      console.log(res);
+    } catch (error) {
+      console.error("Error fetching sections:", error);
+      setSections([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleDialogOpen() {
@@ -81,7 +118,7 @@ export default function Page() {
     }
   }
 
-  async function refetchData() {
+  async function refetchData(): Promise<void> {
     await getData();
   }
 
@@ -100,6 +137,20 @@ export default function Page() {
           columns={createSectionColumns(refetchData)}
           data={sections}
           searchColumn="section_name"
+          manualPagination={true}
+          manualSorting={true}
+          manualFiltering={true}
+          pageCount={totalPages}
+          rowCount={totalRows}
+          state={{
+            pagination,
+            sorting,
+            globalFilter,
+          }}
+          onPaginationChange={setPagination}
+          onSortingChange={setSorting}
+          onGlobalFilterChange={setGlobalFilter}
+          loading={loading}
         />
       </div>
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>

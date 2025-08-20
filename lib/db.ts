@@ -8,4 +8,5 @@ if (!connection_string) {
 
 const sql = neon(connection_string);
 
-export default sql;
+export default sql;
+
