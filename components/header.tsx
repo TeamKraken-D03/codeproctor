@@ -2,8 +2,8 @@
 import { Code, LogOut } from "lucide-react";
 import { signOut, useSession, signIn } from "next-auth/react";
 import { Button } from "./ui/button";
-import { SidebarTrigger } from "./ui/sidebar";
 import Link from "next/link";
+import Image from "next/image";
 
 export function Header() {
   const { data: session } = useSession();
@@ -22,9 +22,12 @@ export function Header() {
         {session ? (
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              <img
-                src={session.user?.image || ""}
+              <Image
+                src={session.user?.image || "/image.png"}
                 alt="Profile"
+                width={100}
+                height={100}
+                priority
                 className="w-9 h-9 rounded-full ring-2 ring-border"
               />
               <div className="hidden sm:block">

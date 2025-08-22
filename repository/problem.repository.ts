@@ -1,49 +1,33 @@
 import sql from "@/lib/db";
 
 export interface testCase {
-    input: string;
-    output: string;
-    tags: string[]; // tag ids
+  input: string;
+  output: string;
 }
 
 export interface createProblem {
-    title: string;
-    description: string;
-    tags: string[]; // tag ids
-    testCases: string[]; // test case ids
+  problemid: string;
+  title: string;
+  description: string;
 }
 
-export async function createTestCase(newTestCase: testCase) {
-    const tags = newTestCase.tags;
-    for (const tag of tags) {
-        sql`INSERT INTO testcases (input, output, tagid) VALUES (${newTestCase.input}, ${newTestCase.output}, ${tag})`;
-    }
+export async function getAllProblems() {
+  try {
+    const problems = await sql`SELECT * FROM problems`;
+    return problems;
+  } catch (error) {
+    console.error("Error getting all problems:", error);
+    throw error;
+  }
 }
 
-
-export function createProblem(newProblem: createProblem){
-    const tags = newProblem.tags;
-    const testCases = newProblem.testCases;
+export async function createProblem(newProblem: createProblem) {
+  try {
+    const result =
+      await sql`INSERT INTO problems (id, title, description) VALUES (${newProblem.problemid},${newProblem.title}, ${newProblem.description}) RETURNING *`;
+    return result[0];
+  } catch (error) {
+    console.error("Error creating problem:", error);
+    throw error;
+  }
 }
-
-export function getTestCases(){
-    
-}
-
-export function getTags(){
-
-
-}
-
-export function createTag(){
-
-}
-
-export function addTagToProblem(){
-
-}
-
-export function addTestCaseToProblem(){
-
-}
-
