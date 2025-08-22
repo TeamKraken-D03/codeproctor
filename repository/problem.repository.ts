@@ -31,3 +31,23 @@ export async function createProblem(newProblem: createProblem) {
     throw error;
   }
 }
+
+export async function getProblemById(id: string) {
+  try {
+    const problem = await sql`SELECT * FROM problems WHERE id = ${id}`;
+    return problem[0] || null;
+  } catch (error) {
+    console.error("Error getting problem by id:", error);
+    throw error;
+  }
+}
+
+export async function deleteProblem(id: string) {
+  try {
+    const result = await sql`DELETE FROM problems WHERE id = ${id} RETURNING *`;
+    return result[0] || null;
+  } catch (error) {
+    console.error("Error deleting problem:", error);
+    throw error;
+  }
+}
