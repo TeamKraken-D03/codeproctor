@@ -29,11 +29,13 @@ export async function getUsersWithPagination(
 
     if (search) {
       // Search with pagination and sorting
+      search = search.trim();
       const searchPattern = `%${search}%`;
+      
       
       users = await sql`
         SELECT id, name, email, role FROM users
-        WHERE name ILIKE ${searchPattern} OR email ILIKE ${searchPattern}
+        WHERE name ILIKE ${searchPattern} OR role ILIKE ${searchPattern}
         ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
         LIMIT ${pageSize} OFFSET ${offset}
       `;
