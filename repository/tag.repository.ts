@@ -28,3 +28,14 @@ export async function getTags() {
     throw error;
   }
 }
+
+export async function addTagToTestcase(tagId: string, testcaseId: string) {
+  try {
+    const data =
+      await sql`INSERT INTO testcases_tags (testcase_id, tag_id) VALUES (${testcaseId}, ${tagId})`;
+    return data;
+  } catch (error) {
+    console.error("Error adding tag to test case:", error);
+    throw error;
+  }
+}

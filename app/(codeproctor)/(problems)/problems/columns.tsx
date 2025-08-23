@@ -121,6 +121,10 @@ export const createColumns = (
         setIsDeleteDialogOpen(true);
       };
 
+      const handleView = () => {
+        router.push(`/problems/${row.original.id}`);
+      };
+
       async function deleteProblem(problemId: string) {
         try {
           const res = await fetch(`/api/problems/${problemId}`, {
@@ -155,6 +159,9 @@ export const createColumns = (
                 Copy problem ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleView}>
+                View Problem
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDelete}>
                 Delete
               </DropdownMenuItem>
