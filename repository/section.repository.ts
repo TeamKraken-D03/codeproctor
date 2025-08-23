@@ -43,7 +43,6 @@ export async function getSectionsWithPagination(
   try {
     const offset = (page - 1) * pageSize;
     
-    // Validate sortBy to prevent SQL injection
     const allowedSortColumns = ["section_name", "semester_name", "department_name", "is_active"];
     const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "section_name";
     const safeSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
@@ -51,7 +50,7 @@ export async function getSectionsWithPagination(
     let sections, totalResult;
 
     if (search) {
-      // Search with pagination and sorting
+
       const searchPattern = `%${search}%`;
       
       sections = await sql`
@@ -67,7 +66,6 @@ export async function getSectionsWithPagination(
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count for search
       totalResult = await sql`
         SELECT COUNT(DISTINCT sections.id) as count 
         FROM sections
@@ -78,7 +76,7 @@ export async function getSectionsWithPagination(
            OR departments.name ILIKE ${searchPattern}
       `;
     } else {
-      // No search, just pagination and sorting
+
       sections = await sql`
         SELECT DISTINCT sections.name as section_name, semesters.name as semester_name, 
                departments.name as department_name, sections.isactive as is_active 
@@ -89,7 +87,6 @@ export async function getSectionsWithPagination(
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count
       totalResult = await sql`
         SELECT COUNT(DISTINCT sections.id) as count 
         FROM sections

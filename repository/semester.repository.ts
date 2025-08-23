@@ -23,7 +23,6 @@ export async function getSemestersWithPagination(
   try {
     const offset = (page - 1) * pageSize;
     
-    // Validate sortBy to prevent SQL injection
     const allowedSortColumns = ["id", "name", "year"];
     const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "id";
     const safeSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
@@ -31,7 +30,6 @@ export async function getSemestersWithPagination(
     let semesters, totalResult;
 
     if (search) {
-      // Search with pagination and sorting
       const searchPattern = `%${search}%`;
       
       semesters = await sql`
@@ -41,13 +39,11 @@ export async function getSemestersWithPagination(
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count for search
       totalResult = await sql`
         SELECT COUNT(*) as count FROM semesters
         WHERE name ILIKE ${searchPattern} OR year::text ILIKE ${searchPattern}
       `;
     } else {
-      // No search, just pagination and sorting
       semesters = await sql`
         SELECT id, name, year FROM semesters
         ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}

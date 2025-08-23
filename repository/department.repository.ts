@@ -22,7 +22,6 @@ export async function getDepartmentsWithPagination(
   try {
     const offset = (page - 1) * pageSize;
     
-    // Validate sortBy to prevent SQL injection
     const allowedSortColumns = ["id", "name"];
     const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "id";
     const safeSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
@@ -30,7 +29,7 @@ export async function getDepartmentsWithPagination(
     let departments, totalResult;
 
     if (search) {
-      // Search with pagination and sorting
+
       const searchPattern = `%${search}%`;
       
       departments = await sql`
@@ -40,20 +39,18 @@ export async function getDepartmentsWithPagination(
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count for search
       totalResult = await sql`
         SELECT COUNT(*) as count FROM departments
         WHERE name ILIKE ${searchPattern}
       `;
     } else {
-      // No search, just pagination and sorting
+
       departments = await sql`
         SELECT id, name FROM departments
         ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count
       totalResult = await sql`SELECT COUNT(*) as count FROM departments`;
     }
 

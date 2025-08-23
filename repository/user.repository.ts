@@ -20,7 +20,6 @@ export async function getUsersWithPagination(
   try {
     const offset = (page - 1) * pageSize;
     
-    // Validate sortBy to prevent SQL injection
     const allowedSortColumns = ["id", "name", "email", "role"];
     const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "id";
     const safeSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
@@ -28,7 +27,6 @@ export async function getUsersWithPagination(
     let users, totalResult;
 
     if (search) {
-      // Search with pagination and sorting
       search = search.trim();
       const searchPattern = `%${search}%`;
       
@@ -40,20 +38,17 @@ export async function getUsersWithPagination(
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count for search
       totalResult = await sql`
         SELECT COUNT(*) as count FROM users
         WHERE name ILIKE ${searchPattern} OR email ILIKE ${searchPattern}
       `;
     } else {
-      // No search, just pagination and sorting
       users = await sql`
         SELECT id, name, email, role FROM users
         ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count
       totalResult = await sql`SELECT COUNT(*) as count FROM users`;
     }
 
