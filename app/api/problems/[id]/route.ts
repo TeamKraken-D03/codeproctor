@@ -1,7 +1,4 @@
-import {
-  deleteProblem,
-  getProblemById,
-} from "@/repository/problem.repository";
+import { deleteProblem, getProblemById } from "@/repository/problem.repository";
 
 export async function GET(
   req: Request,
