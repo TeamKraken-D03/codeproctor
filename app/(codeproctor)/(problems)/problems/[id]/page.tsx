@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Editor from "@monaco-editor/react";
 import { ChevronDown } from "lucide-react";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 export default function Page() {
   const { id } = useParams();
@@ -40,7 +41,7 @@ export default function Page() {
             <div className="space-y-4">
               <div>
                 <h2 className="text-2xl font-semibold text-foreground mb-2">
-                  {problem.title || "Loading..."}
+                  {capitalizeFirstLetter(problem.title) || "Loading..."}
                 </h2>
               </div>
 
