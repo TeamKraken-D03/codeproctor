@@ -19,7 +19,7 @@ export async function getUsersWithPagination(
 ) {
   try {
     const offset = (page - 1) * pageSize;
-    
+
     const allowedSortColumns = ["id", "name", "email", "role"];
     const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "id";
     const safeSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
@@ -29,8 +29,7 @@ export async function getUsersWithPagination(
     if (search) {
       search = search.trim();
       const searchPattern = `%${search}%`;
-      
-      
+
       users = await sql`
         SELECT id, name, email, role FROM users
         WHERE name ILIKE ${searchPattern} OR role ILIKE ${searchPattern}
@@ -59,7 +58,7 @@ export async function getUsersWithPagination(
       total,
       page,
       pageSize,
-      totalPages: Math.ceil(total / pageSize)
+      totalPages: Math.ceil(total / pageSize),
     };
   } catch (error) {
     console.error("Error getting paginated users:", error);
