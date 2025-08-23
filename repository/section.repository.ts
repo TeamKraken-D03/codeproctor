@@ -33,6 +33,86 @@ export async function getAllSections(){
     }
 }
 
+export async function getSectionsWithPagination(
+  page: number,
+  pageSize: number,
+  search: string,
+  sortBy: string,
+  sortOrder: string
+) {
+  try {
+    const offset = (page - 1) * pageSize;
+    
+    // Validate sortBy to prevent SQL injection
+    const allowedSortColumns = ["section_name", "semester_name", "department_name", "is_active"];
+    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "section_name";
+    const safeSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
+
+    let sections, totalResult;
+
+    if (search) {
+      // Search with pagination and sorting
+      const searchPattern = `%${search}%`;
+      
+      sections = await sql`
+        SELECT DISTINCT sections.name as section_name, semesters.name as semester_name, 
+               departments.name as department_name, sections.isactive as is_active 
+        FROM sections
+        INNER JOIN semesters ON sections.semesterid = semesters.id
+        INNER JOIN departments ON sections.departmentid = departments.id
+        WHERE sections.name ILIKE ${searchPattern} 
+           OR semesters.name ILIKE ${searchPattern} 
+           OR departments.name ILIKE ${searchPattern}
+        ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
+        LIMIT ${pageSize} OFFSET ${offset}
+      `;
+
+      // Get total count for search
+      totalResult = await sql`
+        SELECT COUNT(DISTINCT sections.id) as count 
+        FROM sections
+        INNER JOIN semesters ON sections.semesterid = semesters.id
+        INNER JOIN departments ON sections.departmentid = departments.id
+        WHERE sections.name ILIKE ${searchPattern} 
+           OR semesters.name ILIKE ${searchPattern} 
+           OR departments.name ILIKE ${searchPattern}
+      `;
+    } else {
+      // No search, just pagination and sorting
+      sections = await sql`
+        SELECT DISTINCT sections.name as section_name, semesters.name as semester_name, 
+               departments.name as department_name, sections.isactive as is_active 
+        FROM sections
+        INNER JOIN semesters ON sections.semesterid = semesters.id
+        INNER JOIN departments ON sections.departmentid = departments.id
+        ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
+        LIMIT ${pageSize} OFFSET ${offset}
+      `;
+
+      // Get total count
+      totalResult = await sql`
+        SELECT COUNT(DISTINCT sections.id) as count 
+        FROM sections
+        INNER JOIN semesters ON sections.semesterid = semesters.id
+        INNER JOIN departments ON sections.departmentid = departments.id
+      `;
+    }
+
+    const total = parseInt(totalResult[0].count);
+
+    return {
+      data: sections,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize)
+    };
+  } catch (error) {
+    console.error("Error getting paginated sections:", error);
+    throw error;
+  }
+}
+
 export async function editSection(newSection: section){
     try{
         await sql`UPDATE sections
