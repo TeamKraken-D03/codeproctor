@@ -8,6 +8,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    params = await params;
     const problem = await getProblemById(params.id);
 
     if (!problem) {

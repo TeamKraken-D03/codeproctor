@@ -51,3 +51,18 @@ export async function deleteProblem(id: string) {
     throw error;
   }
 }
+
+interface updateProblemDTO{
+  title?: string;
+  description?: string;
+}
+
+export async function editProblem(id: string, updatedProblem: updateProblemDTO) {
+  try {
+    const result = await sql`UPDATE problems SET title = ${updatedProblem.title}, description = ${updatedProblem.description} WHERE id = ${id} RETURNING *`;
+    return result[0] || null;
+  } catch (error) {
+    console.error("Error editing problem:", error);
+    throw error;
+  }
+}
