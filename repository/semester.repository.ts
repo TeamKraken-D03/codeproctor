@@ -13,6 +13,66 @@ export async function getAllSemesters(){
     }
 }
 
+export async function getSemestersWithPagination(
+  page: number,
+  pageSize: number,
+  search: string,
+  sortBy: string,
+  sortOrder: string
+) {
+  try {
+    const offset = (page - 1) * pageSize;
+    
+    // Validate sortBy to prevent SQL injection
+    const allowedSortColumns = ["id", "name", "year"];
+    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "id";
+    const safeSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
+
+    let semesters, totalResult;
+
+    if (search) {
+      // Search with pagination and sorting
+      const searchPattern = `%${search}%`;
+      
+      semesters = await sql`
+        SELECT id, name, year FROM semesters
+        WHERE name ILIKE ${searchPattern} OR year::text ILIKE ${searchPattern}
+        ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
+        LIMIT ${pageSize} OFFSET ${offset}
+      `;
+
+      // Get total count for search
+      totalResult = await sql`
+        SELECT COUNT(*) as count FROM semesters
+        WHERE name ILIKE ${searchPattern} OR year::text ILIKE ${searchPattern}
+      `;
+    } else {
+      // No search, just pagination and sorting
+      semesters = await sql`
+        SELECT id, name, year FROM semesters
+        ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
+        LIMIT ${pageSize} OFFSET ${offset}
+      `;
+
+      // Get total count
+      totalResult = await sql`SELECT COUNT(*) as count FROM semesters`;
+    }
+
+    const total = parseInt(totalResult[0].count);
+
+    return {
+      data: semesters,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize)
+    };
+  } catch (error) {
+    console.error("Error getting paginated semesters:", error);
+    throw error;
+  }
+}
+
 export async function editSemester(body: semester){
     try{
         await 

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import sql from "@/lib/db";
 import {
+  getSemestersWithPagination,
   createSemester,
   editSemester,
   deleteSemester,
@@ -16,52 +16,9 @@ export async function GET(req: NextRequest) {
     const sortBy = searchParams.get("sortBy") || "id";
     const sortOrder = searchParams.get("sortOrder") || "asc";
 
-    const offset = (page - 1) * pageSize;
-    
-    // Validate sortBy to prevent SQL injection
-    const allowedSortColumns = ["id", "name", "year"];
-    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "id";
-    const safeSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
+    const result = await getSemestersWithPagination(page, pageSize, search, sortBy, sortOrder);
 
-    let semesters, totalResult;
-
-    if (search) {
-      // Search with pagination and sorting
-      const searchPattern = `%${search}%`;
-      
-      semesters = await sql`
-        SELECT id, name, year FROM semesters
-        WHERE name ILIKE ${searchPattern} OR year::text ILIKE ${searchPattern}
-        ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
-        LIMIT ${pageSize} OFFSET ${offset}
-      `;
-
-      // Get total count for search
-      totalResult = await sql`
-        SELECT COUNT(*) as count FROM semesters
-        WHERE name ILIKE ${searchPattern} OR year::text ILIKE ${searchPattern}
-      `;
-    } else {
-      // No search, just pagination and sorting
-      semesters = await sql`
-        SELECT id, name, year FROM semesters
-        ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
-        LIMIT ${pageSize} OFFSET ${offset}
-      `;
-
-      // Get total count
-      totalResult = await sql`SELECT COUNT(*) as count FROM semesters`;
-    }
-
-    const total = parseInt(totalResult[0].count);
-
-    return new Response(JSON.stringify({
-      data: semesters,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize)
-    }), {
+    return new Response(JSON.stringify(result), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
