@@ -9,14 +9,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 
-const handleDeleteSection = () => {
-  console.log("delete");
-};
-
-const handleEditSection = () => {
-  console.log("Edit");
-};
-
 interface getSectionType{
   id: string;
   section_name: string;
@@ -25,7 +17,8 @@ interface getSectionType{
 }
 
 export const createSectionColumns = (
-  refetchData: () => Promise<void>
+  refetchData: () => Promise<void>,
+  openEditDialog: (section: getSectionType) => void
 ): ColumnDef<getSectionType>[] => [
   {
     id: "select",
@@ -95,7 +88,35 @@ export const createSectionColumns = (
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-  
+      
+      const handleDeleteSection = async () => {
+        if (confirm(`Are you sure you want to delete the section "${row.original.section_name}"?`)) {
+          try {
+            const response = await fetch("/api/sections", {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ id: row.original.id }),
+            });
+
+            if (response.ok) {
+              await refetchData();
+            } else {
+              const error = await response.json();
+              alert(`Failed to delete section: ${error.error || "Unknown error"}`);
+            }
+          } catch (error) {
+            console.error("Error deleting section:", error);
+            alert("Failed to delete section");
+          }
+        }
+      };
+
+      const handleEditSection = () => {
+        openEditDialog(row.original);
+      };
+
       return (
         <>
           <DropdownMenu>

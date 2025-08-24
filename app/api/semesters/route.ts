@@ -98,7 +98,7 @@ export async function DELETE(req: Request) {
   }
 }
 
-export async function PATCH(req: Request) {
+export async function PUT(req: Request) {
   try {
     const body = await req.json();
     const res = await editSemester(body);

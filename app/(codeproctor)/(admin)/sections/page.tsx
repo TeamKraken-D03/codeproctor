@@ -18,8 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { department, semester } from "@/types/types";
+import { department, semester, section } from "@/types/types";
 import { createSectionType } from "@/repository/section.repository";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { DialogFooter } from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
 
 export default function Page() {
   const [sections, setSections] = useState([]);
@@ -39,6 +43,11 @@ export default function Page() {
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedSemester, setSelectedSemester] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
+  
+  // Edit dialog state
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editSection, setEditSection] = useState<any>(null);
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     getData();
@@ -121,6 +130,51 @@ export default function Page() {
     await getData();
   }
 
+  async function handleEditSection(): Promise<void> {
+    if (!editSection?.section_name.trim() || !editSection?.departmentid || !editSection?.semesterid) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    setEditLoading(true);
+    try {
+      const response = await fetch("/api/sections", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editSection.id,
+          name: editSection.section_name.trim(),
+          semesterid: editSection.semesterid,
+          departmentid: editSection.departmentid,
+          isactive: editSection.is_active,
+        }),
+      });
+
+      if (response.ok) {
+        setIsEditDialogOpen(false);
+        setEditSection(null);
+        await refetchData();
+      } else {
+        const error = await response.json();
+        alert(`Failed to update section: ${error.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error updating section:", error);
+      alert("Failed to update section");
+    } finally {
+      setEditLoading(false);
+    }
+  }
+
+  function openEditDialog(section: any): void {
+    setEditSection({ ...section });
+    setIsEditDialogOpen(true);
+    // Load departments and semesters for the edit dialog
+    handleDialogOpen();
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -133,7 +187,7 @@ export default function Page() {
       </div>
       <div className="rounded-lg border bg-card shadow-sm p-4">
         <DataTable
-          columns={createSectionColumns(refetchData)}
+          columns={createSectionColumns(refetchData, openEditDialog)}
           data={sections}
           searchColumn="section_name"
           manualPagination={true}
@@ -213,6 +267,104 @@ export default function Page() {
               Create Section
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Section Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Section</DialogTitle>
+            <DialogDescription>
+              Update the section information. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="edit-section-name" className="text-right">
+                Section Name
+              </Label>
+              <Select
+                value={editSection?.section_name || ""}
+                onValueChange={(value) =>
+                  setEditSection((prev: any) => prev ? { ...prev, section_name: value } : null)
+                }
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select a section" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A">A</SelectItem>
+                  <SelectItem value="B">B</SelectItem>
+                  <SelectItem value="C">C</SelectItem>
+                  <SelectItem value="D">D</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="edit-department" className="text-right">
+                Department
+              </Label>
+              <Select
+                value={editSection?.departmentid || ""}
+                onValueChange={(value) =>
+                  setEditSection((prev: any) => prev ? { ...prev, departmentid: value } : null)
+                }
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select a department" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((department) => (
+                    <SelectItem key={department.id} value={department.id}>
+                      {department.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="edit-semester" className="text-right">
+                Semester
+              </Label>
+              <Select
+                value={editSection?.semesterid || ""}
+                onValueChange={(value) =>
+                  setEditSection((prev: any) => prev ? { ...prev, semesterid: value } : null)
+                }
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select a semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  {semesters.map((semester) => (
+                    <SelectItem key={semester.id} value={semester.id}>
+                      {semester.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setIsEditDialogOpen(false);
+                setEditSection(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              onClick={handleEditSection}
+              disabled={editLoading}
+            >
+              {editLoading ? "Updating..." : "Update Section"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

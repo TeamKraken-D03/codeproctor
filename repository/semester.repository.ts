@@ -71,8 +71,7 @@ export async function getSemestersWithPagination(
 
 export async function editSemester(body: semester){
     try{
-        await 
-        sql`UPDATE semesters
+        await sql`UPDATE semesters
         SET name=${body.name}, year=${body.year}
         WHERE id=${body.id}`
 
@@ -84,22 +83,21 @@ export async function editSemester(body: semester){
     }
 }
 
-export async function createSemester(body: semester){
+export async function createSemester(body: { name: string; year: string }){
     try{
-        const res = await 
-        sql`INSERT INTO semesters VALUES(${body.name}, ${body.year})`;
+        const res = await sql`INSERT INTO semesters (name, year) VALUES (${body.name}, ${body.year}) RETURNING id, name, year`;
 
         return {success: true, message: `Added new semester ${res[0].id} ${res[0].name}`}
     }
     catch(e){
+        console.log(e);
         return {success: false, message: `Add new semester failed`}
     }
 }
 
 export async function deleteSemester(id: string){
     try{
-        await 
-        sql`DELETE semesters WHERE id=${id}`;
+        await sql`DELETE FROM semesters WHERE id=${id}`;
 
         return {success: true, message: `Deleted semester ${id}`};
     }

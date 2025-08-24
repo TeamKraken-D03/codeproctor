@@ -85,22 +85,23 @@ export async function editDepartment(body: department) {
   }
 }
 
-export async function createDepartment(body: department) {
+export async function createDepartment(body: { name: string }) {
   try {
-    const res = await sql`INSERT INTO departments VALUES(${body.name})`;
+    const res = await sql`INSERT INTO departments (name) VALUES (${body.name}) RETURNING id, name`;
 
     return {
       success: true,
       message: `Added new department ${res[0].id} ${res[0].name}`,
     };
   } catch (e) {
+    console.log(e);
     return { success: false, message: `Add new department failed` };
   }
 }
 
 export async function deleteDepartment(id: string) {
   try {
-    await sql`DELETE departments WHERE id=${id}`;
+    await sql`DELETE FROM departments WHERE id=${id}`;
 
     return { success: true, message: `Deleted department ${id}` };
   } catch (e) {

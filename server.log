@@ -1,0 +1,13 @@
+
+> codeproctor@0.1.0 dev
+> next dev --turbopack
+
+ ⚠ Port 3000 is in use by process 25928, using available port 3001 instead.
+   ▲ Next.js 15.4.6 (Turbopack)
+   - Local:        http://localhost:3001
+   - Network:      http://10.12.235.45:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1268ms
+^Cnpm error A complete log of this run can be found in: C:\Users\naren\AppData\Local\npm-cache\_logs\2025-08-24T15_26_13_113Z-debug-0.log

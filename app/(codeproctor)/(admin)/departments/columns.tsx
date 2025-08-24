@@ -13,16 +13,9 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
 
-const handleDeleteDepartment = () => {
-  console.log("delete");
-};
-
-const handleEditDepartment = () => {
-  console.log("Edit");
-};
-
 export const createDepartmentColumns = (
-  refetchData: () => Promise<void>
+  refetchData: () => Promise<void>,
+  openEditDialog: (department: department) => void
 ): ColumnDef<department>[] => [
   {
     id: "select",
@@ -79,6 +72,30 @@ export const createDepartmentColumns = (
     enableHiding: false,
     cell: ({ row }) => {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+      const handleDeleteDepartment = async () => {
+        if (confirm(`Are you sure you want to delete the department "${row.original.name}"?`)) {
+          try {
+            const response = await fetch(`/api/departments?id=${row.original.id}`, {
+              method: "DELETE",
+            });
+
+            if (response.ok) {
+              await refetchData();
+            } else {
+              const error = await response.json();
+              alert(`Failed to delete department: ${error.error || "Unknown error"}`);
+            }
+          } catch (error) {
+            console.error("Error deleting department:", error);
+            alert("Failed to delete department");
+          }
+        }
+      };
+
+      const handleEditDepartment = () => {
+        openEditDialog(row.original);
+      };
 
       const handleAssignRole = () => {
         setIsDialogOpen(true);

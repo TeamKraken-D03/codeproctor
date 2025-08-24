@@ -27,16 +27,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const handleDeleteSemester = () =>{
-  console.log("delete");
-}
-
-const handleEditSemester = () => {
-  console.log("Edit");
-}
-
 export const createSemesterColumns = (
-  refetchData: () => Promise<void>
+  refetchData: () => Promise<void>,
+  openEditDialog: (semester: semester) => void
 ): ColumnDef<semester>[] => [
   {
     id: "select",
@@ -107,6 +100,30 @@ export const createSemesterColumns = (
     enableHiding: false,
     cell: ({ row }) => {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+      const handleDeleteSemester = async () => {
+        if (confirm(`Are you sure you want to delete the semester "${row.original.name} (${row.original.year})"?`)) {
+          try {
+            const response = await fetch(`/api/semesters?id=${row.original.id}`, {
+              method: "DELETE",
+            });
+
+            if (response.ok) {
+              await refetchData();
+            } else {
+              const error = await response.json();
+              alert(`Failed to delete semester: ${error.error || "Unknown error"}`);
+            }
+          } catch (error) {
+            console.error("Error deleting semester:", error);
+            alert("Failed to delete semester");
+          }
+        }
+      };
+
+      const handleEditSemester = () => {
+        openEditDialog(row.original);
+      };
 
       const handleAssignRole = () => {
         setIsDialogOpen(true);

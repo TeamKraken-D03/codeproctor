@@ -99,7 +99,8 @@ export async function getSectionsWithPagination(
       
       sections = await sql`
         SELECT DISTINCT sections.id, sections.name as section_name, semesters.name as semester_name, 
-               departments.name as department_name, sections.isactive as is_active 
+               departments.name as department_name, sections.isactive as is_active,
+               sections.semesterid, sections.departmentid
         FROM sections
         INNER JOIN semesters ON sections.semesterid = semesters.id
         INNER JOIN departments ON sections.departmentid = departments.id
@@ -123,7 +124,8 @@ export async function getSectionsWithPagination(
 
       sections = await sql`
         SELECT DISTINCT sections.id, sections.name as section_name, semesters.name as semester_name, 
-               departments.name as department_name, sections.isactive as is_active 
+               departments.name as department_name, sections.isactive as is_active,
+               sections.semesterid, sections.departmentid
         FROM sections
         INNER JOIN semesters ON sections.semesterid = semesters.id
         INNER JOIN departments ON sections.departmentid = departments.id
@@ -157,7 +159,7 @@ export async function getSectionsWithPagination(
 export async function editSection(newSection: section){
     try{
         await sql`UPDATE sections
-        SET name = ${newSection.name}, userid = ${newSection.userid}, semesterid = ${newSection.semesterid}, departmentid = ${newSection.departmentid}, isactive = ${newSection.isactive}
+        SET name = ${newSection.name}, semesterid = ${newSection.semesterid}, departmentid = ${newSection.departmentid}, isactive = ${newSection.isactive}
         WHERE id = ${newSection.id}`;
         return true;
     }

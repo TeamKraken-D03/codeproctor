@@ -29,7 +29,7 @@ export type user = {
 export type semester = {
   id: string;
   name: string;
-  year: string;
+  year: string | number;
 };
 
 export type department = {
