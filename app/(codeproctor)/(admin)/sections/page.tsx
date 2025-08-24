@@ -170,7 +170,6 @@ export default function Page() {
   function openEditDialog(section: any): void {
     setEditSection({ ...section });
     setIsEditDialogOpen(true);
-    handleDialogOpen();
   }
 
   return (
