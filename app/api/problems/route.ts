@@ -1,13 +1,34 @@
-import { createProblem, getAllProblems } from "@/repository/problem.repository";
+import { createProblem, getProblemsWithPagination } from "@/repository/problem.repository";
+import { NextRequest } from "next/server";
 
-export async function GET() {
-  const problems = await getAllProblems();
-  return new Response(JSON.stringify(problems), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    
+    const page = parseInt(searchParams.get("page") || "1");
+    const pageSize = parseInt(searchParams.get("pageSize") || "10");
+    const search = searchParams.get("search") || "";
+    const sortBy = searchParams.get("sortBy") || "id";
+    const sortOrder = searchParams.get("sortOrder") || "asc";
+
+    const result = await getProblemsWithPagination(page, pageSize, search, sortBy, sortOrder);
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+  } catch (error) {
+    console.error("Error fetching problems:", error);
+    return new Response(JSON.stringify({ error: "Failed to fetch problems" }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
 }
 
 export async function POST(req: Request) {

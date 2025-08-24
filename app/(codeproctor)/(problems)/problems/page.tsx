@@ -8,26 +8,51 @@ import { useRouter } from "next/navigation";
 
 export default function ProblemsPage() {
   const [data, setData] = useState<problem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [sorting, setSorting] = useState<any[]>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [totalRows, setTotalRows] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [pagination, sorting, globalFilter]);
 
-  async function getData(): Promise<problem[]> {
+  async function getData(): Promise<void> {
+    setLoading(true);
     try {
-      const problems = await fetch(`/api/problems`);
+      const sortBy = sorting.length > 0 ? sorting[0].id : "id";
+      const sortOrder = sorting.length > 0 && sorting[0].desc ? "desc" : "asc";
+      
+      const params = new URLSearchParams({
+        page: (pagination.pageIndex + 1).toString(),
+        pageSize: pagination.pageSize.toString(),
+        search: globalFilter,
+        sortBy,
+        sortOrder,
+      });
+
+      const problems = await fetch(`/api/problems?${params.toString()}`);
 
       if (!problems.ok) {
         throw new Error("Failed to fetch problems");
       }
+      
       const res = await problems.json();
-      setData(res);
+      setData(res.data);
+      setTotalRows(res.total);
+      setTotalPages(res.totalPages);
       console.log(res);
-      return res;
     } catch (error) {
       console.error("Error fetching problems:", error);
-      return [];
+      setData([]);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -46,7 +71,25 @@ export default function ProblemsPage() {
         </Button>
       </h1>
       <div className="rounded-lg border bg-card shadow-sm">
-        <DataTable columns={columns} data={data} searchColumn="title" />
+        <DataTable 
+          columns={columns} 
+          data={data} 
+          searchColumn="title"
+          manualPagination={true}
+          manualSorting={true}
+          manualFiltering={true}
+          pageCount={totalPages}
+          rowCount={totalRows}
+          state={{
+            pagination,
+            sorting,
+            globalFilter,
+          }}
+          onPaginationChange={setPagination}
+          onSortingChange={setSorting}
+          onGlobalFilterChange={setGlobalFilter}
+          loading={loading}
+        />
       </div>
     </div>
   );
