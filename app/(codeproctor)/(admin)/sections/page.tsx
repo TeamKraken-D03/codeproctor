@@ -44,7 +44,6 @@ export default function Page() {
   const [selectedSemester, setSelectedSemester] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
   
-  // Edit dialog state
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editSection, setEditSection] = useState<any>(null);
   const [editLoading, setEditLoading] = useState(false);
@@ -171,7 +170,6 @@ export default function Page() {
   function openEditDialog(section: any): void {
     setEditSection({ ...section });
     setIsEditDialogOpen(true);
-    // Load departments and semesters for the edit dialog
     handleDialogOpen();
   }
 
@@ -270,7 +268,6 @@ export default function Page() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Section Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
