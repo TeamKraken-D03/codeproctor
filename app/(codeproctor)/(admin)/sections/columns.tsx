@@ -18,9 +18,10 @@ const handleEditSection = () => {
 };
 
 interface getSectionType{
-  section_name: string
-  semester_name: string
-  department_name: string
+  id: string;
+  section_name: string;
+  semester_name: string;
+  department_name: string;
 }
 
 export const createSectionColumns = (
@@ -111,6 +112,13 @@ export const createSectionColumns = (
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDeleteSection}>
                 Delete
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  window.location.href = `/sections/${row.original.id}`;
+                }}
+              >
+                Assign User
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

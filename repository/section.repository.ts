@@ -1,3 +1,47 @@
+// Get users assigned to a section
+export async function getAssignedUsers(sectionid: string) {
+  try {
+    const users = await sql`
+      SELECT u.* FROM users u
+      INNER JOIN sections_users su ON u.id = su.userid
+      WHERE su.sectionid = ${sectionid}
+    `;
+    return { status: true, data: users };
+  } catch (e) {
+    console.log(e);
+    return { status: false, error: e };
+  }
+}
+
+// Get users not assigned to a section
+export async function getUnassignedUsers(sectionid: string) {
+  try {
+    const users = await sql`
+      SELECT u.* FROM users u
+      WHERE u.id NOT IN (
+        SELECT su.userid FROM sections_users su WHERE su.sectionid = ${sectionid}
+      )
+    `;
+    return { status: true, data: users };
+  } catch (e) {
+    console.log(e);
+    return { status: false, error: e };
+  }
+}
+
+// Assign a user to a section
+export async function assignUserToSection(sectionid: string, userid: string) {
+  try {
+    await sql`
+      INSERT INTO sections_users (sectionid, userid)
+      VALUES (${sectionid}, ${userid})
+    `;
+    return { status: true };
+  } catch (e) {
+    console.log(e);
+    return { status: false, error: e };
+  }
+}
 import sql from "@/lib/db";
 import { section } from "@/types/types";
 
@@ -54,7 +98,7 @@ export async function getSectionsWithPagination(
       const searchPattern = `%${search}%`;
       
       sections = await sql`
-        SELECT DISTINCT sections.name as section_name, semesters.name as semester_name, 
+        SELECT DISTINCT sections.id, sections.name as section_name, semesters.name as semester_name, 
                departments.name as department_name, sections.isactive as is_active 
         FROM sections
         INNER JOIN semesters ON sections.semesterid = semesters.id
@@ -78,7 +122,7 @@ export async function getSectionsWithPagination(
     } else {
 
       sections = await sql`
-        SELECT DISTINCT sections.name as section_name, semesters.name as semester_name, 
+        SELECT DISTINCT sections.id, sections.name as section_name, semesters.name as semester_name, 
                departments.name as department_name, sections.isactive as is_active 
         FROM sections
         INNER JOIN semesters ON sections.semesterid = semesters.id
