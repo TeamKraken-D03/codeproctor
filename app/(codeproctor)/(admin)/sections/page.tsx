@@ -82,12 +82,11 @@ export default function Page() {
       setOpenDialog(true);
 
       const [departmentData, semesterData] = await Promise.all([
-        fetch("/api/departments").then((res) => res.json()),
-        fetch("/api/semesters").then((res) => res.json()),
+        fetch("/api/departments/all").then((res) => res.json()),
+        fetch("/api/semesters/all").then((res) => res.json()),
       ]);
-
-      setDepartments(departmentData);
-      setSemesters(semesterData);
+      setDepartments(departmentData.data);
+      setSemesters(semesterData.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
