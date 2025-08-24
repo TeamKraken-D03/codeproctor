@@ -31,7 +31,6 @@ export async function getProblemsWithPagination(
   try {
     const offset = (page - 1) * pageSize;
     
-    // Validate sortBy to prevent SQL injection
     const allowedSortColumns = ["id", "title", "description", "created_at"];
     const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : "id";
     const safeSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
@@ -39,7 +38,7 @@ export async function getProblemsWithPagination(
     let problems, totalResult;
 
     if (search) {
-      // Search with pagination and sorting
+
       const searchPattern = `%${search}%`;
       
       problems = await sql`
@@ -49,20 +48,18 @@ export async function getProblemsWithPagination(
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count for search
       totalResult = await sql`
         SELECT COUNT(*) as count FROM problems
         WHERE title ILIKE ${searchPattern} OR description ILIKE ${searchPattern} OR id::text ILIKE ${searchPattern}
       `;
     } else {
-      // No search, just pagination and sorting
+
       problems = await sql`
         SELECT id, title, description, created_at FROM problems
         ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count
       totalResult = await sql`SELECT COUNT(*) as count FROM problems`;
     }
 

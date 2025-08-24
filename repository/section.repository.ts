@@ -1,3 +1,6 @@
+import sql from "@/lib/db";
+import { section } from "@/types/types";
+
 // Get users assigned to a section
 export async function getAssignedUsers(sectionid: string) {
   try {
@@ -42,8 +45,6 @@ export async function assignUserToSection(sectionid: string, userid: string) {
     return { status: false, error: e };
   }
 }
-import sql from "@/lib/db";
-import { section } from "@/types/types";
 
 export interface createSectionType{
     name: string;

@@ -50,7 +50,6 @@ export async function getSemestersWithPagination(
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
-      // Get total count
       totalResult = await sql`SELECT COUNT(*) as count FROM semesters`;
     }
 
