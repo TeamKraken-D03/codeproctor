@@ -86,7 +86,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    params = await params;
+    const { id } = await params;
     const body = await req.json();
     const { title, description } = body;
 
@@ -102,7 +102,7 @@ export async function PUT(
       );
     }
 
-    const updatedProblem = await editProblem(params.id, { title, description });
+    const updatedProblem = await editProblem(id, { title, description });
 
     if (!updatedProblem) {
       return new Response(JSON.stringify({ error: "Problem not found" }), {

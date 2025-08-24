@@ -5,8 +5,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    params = await params;
-    const result = await deleteTestCase(params.id);
+    const { id } = await params;
+    const result = await deleteTestCase(id);
 
     if (!result) {
       return new Response(JSON.stringify({ error: "Test case not found" }), {

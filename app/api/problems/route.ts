@@ -1,4 +1,5 @@
 import { createProblem, getProblemsWithPagination } from "@/repository/problem.repository";
+import { getServerSession } from "next-auth";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -33,23 +34,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    }
     
     const newProblem: createProblem = await req.json();
 
     // Validate required fields
-    if (!newProblem.problemid || !newProblem.title || !newProblem.description) {
+    if (!newProblem.problemid || !newProblem.title || !newProblem.description || !newProblem.created_by) {
       return new Response(
         JSON.stringify({
-          error: "problemid, title, and description are required",
+          error: "problemid, title, description, and created_by are required",
         }),
         {
           status: 400,
@@ -60,15 +52,7 @@ export async function POST(req: Request) {
       );
     }
     
-    // Add the creator's ID from the session (which should be a UUID)
-    // Only assign if it's a valid UUID to avoid type conversion errors
-    if (session.user.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(session.user.id)) {
-      newProblem.created_by = session.user.id;
-    } else {
-      // If no valid UUID is found, set to null
-      newProblem.created_by = null;
-    }
-
+  
     const res = await createProblem(newProblem);
     console.log(res);
     return new Response(

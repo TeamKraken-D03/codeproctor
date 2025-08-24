@@ -9,8 +9,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    params = await params;
-    const tags = await getTagsForProblem(params.id);
+    const {id} = await params;
+    const tags = await getTagsForProblem(id);
     return new Response(JSON.stringify(tags), {
       status: 200,
       headers: {
@@ -33,10 +33,10 @@ export async function GET(
 
 export async function POST(
   req: Request,
-  context: { params: { id: string } }
+  {params}: { params: { id: string } }
 ) {
   try {
-    params = await params;
+    const { id } = await params;
     const { tagId } = await req.json();
 
     if (!tagId) {
@@ -47,10 +47,6 @@ export async function POST(
         },
       });
     }
-
-    // Await the entire params object before accessing its properties
-    const params = await context.params;
-    const id = params.id;
     
     const res = await addTagToProblem(id, tagId);
     return new Response(
@@ -84,7 +80,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    params = await params;
+    const {id} = await params;
     const { oldTagId, newTagId } = await req.json();
 
     if (!newTagId) {
@@ -98,11 +94,11 @@ export async function PUT(
 
     // Remove old tag if exists
     if (oldTagId) {
-      await removeTagFromProblem(params.id, oldTagId);
+      await removeTagFromProblem(id, oldTagId);
     }
 
     // Add new tag
-    await addTagToProblem(params.id, newTagId);
+    await addTagToProblem(id, newTagId);
 
     return new Response(
       JSON.stringify({
@@ -134,7 +130,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    params = await params;
+    const {id} = await params;
     const { tagId } = await req.json();
 
     if (!tagId) {
@@ -146,7 +142,7 @@ export async function DELETE(
       });
     }
 
-    await removeTagFromProblem(params.id, tagId);
+    await removeTagFromProblem(id, tagId);
 
     return new Response(
       JSON.stringify({

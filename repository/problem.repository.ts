@@ -47,24 +47,29 @@ export async function getProblemsWithPagination(
     if (search) {
       // Search with pagination and sorting
       const searchPattern = `%${search}%`;
-      
+
+      // Join with users table to get creator names
       problems = await sql`
-        SELECT id, title, description, created_at FROM problems
-        WHERE title ILIKE ${searchPattern} OR description ILIKE ${searchPattern} OR id::text ILIKE ${searchPattern}
-        ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
+        SELECT p.id, p.title, p.description, p.created_at, u.name as creator_name
+        FROM problems p
+        LEFT JOIN users u ON p.created_by = u.id
+        WHERE p.title ILIKE ${searchPattern} OR p.description ILIKE ${searchPattern} OR p.id::text ILIKE ${searchPattern}
+        ORDER BY p.${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 
       // Get total count for search
       totalResult = await sql`
-        SELECT COUNT(*) as count FROM problems
-        WHERE title ILIKE ${searchPattern} OR description ILIKE ${searchPattern} OR id::text ILIKE ${searchPattern}
+        SELECT COUNT(*) as count FROM problems p
+        WHERE p.title ILIKE ${searchPattern} OR p.description ILIKE ${searchPattern} OR p.id::text ILIKE ${searchPattern}
       `;
     } else {
       // No search, just pagination and sorting
       problems = await sql`
-        SELECT id, title, description, created_at FROM problems
-        ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
+        SELECT p.id, p.title, p.description, p.created_at, u.name as creator_name
+        FROM problems p
+        LEFT JOIN users u ON p.created_by = u.id
+        ORDER BY p.${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
         LIMIT ${pageSize} OFFSET ${offset}
       `;
 

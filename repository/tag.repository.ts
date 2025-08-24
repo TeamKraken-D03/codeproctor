@@ -13,7 +13,8 @@ export async function addTagToProblem(problemId: string, tagId: string) {
 
 export async function createTag(tagName: string) {
   try {
-    await sql`INSERT INTO tags (name) VALUES (${tagName})`;
+    const result = await sql`INSERT INTO tags (name) VALUES (${tagName}) RETURNING *`;
+    return result[0];
   } catch (error) {
     console.error("Error creating tag:", error);
     throw error;

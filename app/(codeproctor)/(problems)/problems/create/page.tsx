@@ -27,12 +27,30 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export interface Tag {
   id: string;
   name: string;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+}
+
+export interface Semester {
+  id: string;
+  name: string;
+}
+
+export interface Course {
+  id: string;
+  name: string;
+  departmentid: string;
+  semesterid: string;
 }
 
 export interface CreateTestcase {
@@ -68,10 +86,32 @@ export default function Page() {
   const [isCreatingTestcase, setIsCreatingTestcase] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // Tag creation states
+  const [newTagName, setNewTagName] = useState("");
+  const [isCreatingTag, setIsCreatingTag] = useState(false);
+  const [isTagDialogOpen, setIsTagDialogOpen] = useState(false);
+
+  // Department/Semester/Course states
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedSemester, setSelectedSemester] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+
+  // Course creation states
+  const [newCourseName, setNewCourseName] = useState("");
+  const [isCreatingCourse, setIsCreatingCourse] = useState(false);
+  const [isCourseDialogOpen, setIsCourseDialogOpen] = useState(false);
+
+  const {data: session} = useSession();
+
   const router = useRouter();
 
   useEffect(() => {
     fetchTags();
+    fetchDepartments();
+    fetchSemesters();
   }, []);
 
   useEffect(() => {
@@ -80,15 +120,135 @@ export default function Page() {
     }
   }, [problemid]);
 
+  // Fetch courses when department and semester are selected
+  useEffect(() => {
+    if (selectedDepartment && selectedSemester) {
+      fetchCourses();
+    } else {
+      setCourses([]);
+      setSelectedCourse("");
+    }
+  }, [selectedDepartment, selectedSemester]);
+
   async function fetchTags() {
     try {
       const res = await fetch("/api/problems/tags");
       if (res.ok) {
         const data = await res.json();
-        setTags(data);
+        setTags(Array.isArray(data) ? data : []);
+      } else {
+        setTags([]);
       }
     } catch (error) {
       console.error("Failed to fetch tags:", error);
+      setTags([]);
+    }
+  }
+
+  async function fetchDepartments() {
+    try {
+      const res = await fetch("/api/departments/all");
+      if (res.ok) {
+        const response = await res.json();
+        // Handle the response structure from department repository
+        if (response.status && response.data) {
+          setDepartments(response.data);
+        } else {
+          setDepartments([]);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch departments:", error);
+      setDepartments([]);
+    }
+  }
+
+  async function fetchSemesters() {
+    try {
+      const res = await fetch("/api/semesters/all");
+      if (res.ok) {
+        const response = await res.json();
+        // Handle the response structure from semester repository
+        if (response.status && response.data) {
+          setSemesters(response.data);
+        } else {
+          setSemesters([]);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch semesters:", error);
+      setSemesters([]);
+    }
+  }
+
+  async function fetchCourses() {
+    if (!selectedDepartment || !selectedSemester) return;
+    
+    try {
+      const res = await fetch(`/api/courses?departmentId=${selectedDepartment}&semesterId=${selectedSemester}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCourses(Array.isArray(data) ? data : []);
+      } else {
+        setCourses([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch courses:", error);
+      setCourses([]);
+    }
+  }
+
+  async function createNewTag() {
+    if (!newTagName.trim()) return;
+    
+    setIsCreatingTag(true);
+    try {
+      const res = await fetch("/api/problems/tags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newTagName.trim() })
+      });
+
+      if (res.ok) {
+        const newTag = await res.json();
+        setTags(prev => [...prev, newTag]);
+        setSelectedTag(newTag.id);
+        setNewTagName("");
+        setIsTagDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to create tag:", error);
+    } finally {
+      setIsCreatingTag(false);
+    }
+  }
+
+  async function createNewCourse() {
+    if (!newCourseName.trim() || !selectedDepartment || !selectedSemester) return;
+    
+    setIsCreatingCourse(true);
+    try {
+      const res = await fetch("/api/courses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          name: newCourseName.trim(),
+          departmentId: selectedDepartment,
+          semesterId: selectedSemester
+        })
+      });
+
+      if (res.ok) {
+        const newCourse = await res.json();
+        setCourses(prev => [...prev, newCourse]);
+        setSelectedCourse(newCourse.id);
+        setNewCourseName("");
+        setIsCourseDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to create course:", error);
+    } finally {
+      setIsCreatingCourse(false);
     }
   }
 
@@ -113,6 +273,10 @@ export default function Page() {
     setProblemid("");
     setCreatedProblem(false);
     setTestCases([]);
+    setSelectedDepartment("");
+    setSelectedSemester("");
+    setSelectedCourse("");
+    setCourses([]);
   }
 
   function resetTestcaseForm() {
@@ -142,6 +306,7 @@ export default function Page() {
         title: title.trim(),
         description: description.trim(),
         // created_by will be populated from the session in the API
+        created_by: session?.user.id || undefined,
       };
 
       const problemRes = await fetch("/api/problems", {
@@ -163,8 +328,14 @@ export default function Page() {
       setProblemid(newProblemId);
       setCreatedProblem(true);
 
+      // Assign tag if selected
       if (selectedTag) {
         await assignTagToProblem(newProblemId);
+      }
+
+      // Create problem associations if department/semester/course are selected
+      if (selectedDepartment || selectedSemester || selectedCourse) {
+        await createProblemAssociations(newProblemId);
       }
 
       alert("Problem created successfully!");
@@ -177,6 +348,30 @@ export default function Page() {
       );
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function createProblemAssociations(problemId: string) {
+    try {
+      const associations = [{
+        problemId,
+        departmentId: selectedDepartment || undefined,
+        semesterId: selectedSemester || undefined,
+        courseId: selectedCourse || undefined
+      }];
+
+      const res = await fetch("/api/problem-associations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ associations })
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create problem associations");
+      }
+    } catch (error) {
+      console.error("Error creating problem associations:", error);
+      // Don't throw here as the problem was already created successfully
     }
   }
 
@@ -287,25 +482,190 @@ export default function Page() {
 
             <div className="space-y-2">
               <Label htmlFor="tag">Tag (Optional)</Label>
+              <div className="flex gap-2">
+                <Select
+                  value={selectedTag}
+                  onValueChange={setSelectedTag}
+                  disabled={createdProblem || isLoading}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Select a tag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {Array.isArray(tags) && tags.map((tag) => (
+                        <SelectItem key={tag.id} value={tag.id}>
+                          {tag.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <Dialog open={isTagDialogOpen} onOpenChange={setIsTagDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="icon" disabled={createdProblem || isLoading}>
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New Tag</DialogTitle>
+                      <DialogDescription>
+                        Add a new tag that can be used for categorizing problems.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="tagName">Tag Name</Label>
+                        <Input
+                          id="tagName"
+                          placeholder="Enter tag name"
+                          value={newTagName}
+                          onChange={(e) => setNewTagName(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={createNewTag} 
+                          disabled={isCreatingTag || !newTagName.trim()}
+                          className="flex-1"
+                        >
+                          {isCreatingTag ? "Creating..." : "Create Tag"}
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            setIsTagDialogOpen(false);
+                            setNewTagName("");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+
+            {/* Department Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="department">Department (Optional)</Label>
               <Select
-                value={selectedTag}
-                onValueChange={setSelectedTag}
+                value={selectedDepartment}
+                onValueChange={setSelectedDepartment}
                 disabled={createdProblem || isLoading}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a tag" />
+                  <SelectValue placeholder="Select a department" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {tags.map((tag) => (
-                      <SelectItem key={tag.id} value={tag.id}>
-                        {tag.name}
+                    {Array.isArray(departments) && departments.map((dept) => (
+                      <SelectItem key={dept.id} value={dept.id}>
+                        {dept.name}
                       </SelectItem>
                     ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Semester Selection */}
+            {selectedDepartment && (
+              <div className="space-y-2">
+                <Label htmlFor="semester">Semester (Optional)</Label>
+                <Select
+                  value={selectedSemester}
+                  onValueChange={setSelectedSemester}
+                  disabled={createdProblem || isLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a semester" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {Array.isArray(semesters) && semesters.map((semester) => (
+                        <SelectItem key={semester.id} value={semester.id}>
+                          {semester.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Course Selection */}
+            {selectedDepartment && selectedSemester && (
+              <div className="space-y-2">
+                <Label htmlFor="course">Course (Optional)</Label>
+                <div className="flex gap-2">
+                  <Select
+                    value={selectedCourse}
+                    onValueChange={setSelectedCourse}
+                    disabled={createdProblem || isLoading}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select a course" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {Array.isArray(courses) && courses.map((course) => (
+                          <SelectItem key={course.id} value={course.id}>
+                            {course.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <Dialog open={isCourseDialogOpen} onOpenChange={setIsCourseDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="icon" disabled={createdProblem || isLoading}>
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Create New Course</DialogTitle>
+                        <DialogDescription>
+                          Add a new course for the selected department and semester.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="courseName">Course Name</Label>
+                          <Input
+                            id="courseName"
+                            placeholder="Enter course name"
+                            value={newCourseName}
+                            onChange={(e) => setNewCourseName(e.target.value)}
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            onClick={createNewCourse} 
+                            disabled={isCreatingCourse || !newCourseName.trim()}
+                            className="flex-1"
+                          >
+                            {isCreatingCourse ? "Creating..." : "Create Course"}
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            onClick={() => {
+                              setIsCourseDialogOpen(false);
+                              setNewCourseName("");
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+            )}
 
             <div className="flex gap-2 pt-4">
               <Button
