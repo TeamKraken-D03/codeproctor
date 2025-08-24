@@ -243,7 +243,6 @@ export default function Page() {
   return (
     <div className="space-y-6">
       <div>
-        <Button onClick={() => router.back()} className="mb-4" variant={"outline"}>Go Back</Button>
         <h1 className="text-3xl font-bold mb-2 text-foreground">
           Create Problem
         </h1>
@@ -253,7 +252,6 @@ export default function Page() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-
         <Card>
           <CardHeader>
             <CardTitle>Problem Details</CardTitle>

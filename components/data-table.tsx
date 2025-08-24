@@ -38,7 +38,7 @@ interface DataTableProps<TData, TValue> {
   searchColumn?: string; // Optional — which column to filter
   // Server-side props
   manualPagination?: boolean;
-  manualSorting?: boolean; 
+  manualSorting?: boolean;
   manualFiltering?: boolean;
   pageCount?: number;
   rowCount?: number;
@@ -69,9 +69,16 @@ export function DataTable<TData, TValue>({
   loading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const table = useReactTable({
     data,
@@ -83,14 +90,17 @@ export function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
     onSortingChange: onSortingChange || setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    onPaginationChange: onPaginationChange,
+    onPaginationChange: onPaginationChange || setPagination,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: manualPagination ? undefined : getPaginationRowModel(),
+    getPaginationRowModel: manualPagination
+      ? undefined
+      : getPaginationRowModel(),
     getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
     getFilteredRowModel: manualFiltering ? undefined : getFilteredRowModel(),
     manualPagination,
@@ -107,13 +117,16 @@ export function DataTable<TData, TValue>({
             value={
               onGlobalFilterChange && state?.globalFilter !== undefined
                 ? state.globalFilter
-                : (table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""
+                : (table.getColumn(searchColumn)?.getFilterValue() as string) ??
+                  ""
             }
             onChange={(event) => {
               if (onGlobalFilterChange) {
                 onGlobalFilterChange(event.target.value);
               } else {
-                table.getColumn(searchColumn)?.setFilterValue(event.target.value);
+                table
+                  .getColumn(searchColumn)
+                  ?.setFilterValue(event.target.value);
               }
             }}
             className="max-w-sm"
@@ -134,7 +147,9 @@ export function DataTable<TData, TValue>({
                   key={column.id}
                   className="capitalize"
                   checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(value === true)}
+                  onCheckedChange={(value) =>
+                    column.toggleVisibility(value === true)
+                  }
                 >
                   {column.id}
                 </DropdownMenuCheckboxItem>
@@ -151,7 +166,10 @@ export function DataTable<TData, TValue>({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -166,14 +184,20 @@ export function DataTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   {loading ? "Loading..." : "No results."}
                 </TableCell>
               </TableRow>
@@ -182,27 +206,37 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+        <div className="flex items-center space-x-6 lg:space-x-8">
+          <div className="text-muted-foreground flex items-center space-x-2 text-sm">
+            <span>
+              {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </span>
+          </div>
+          <div className="text-muted-foreground flex items-center space-x-2 text-sm">
+            <span>
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
+            </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
     </div>

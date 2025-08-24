@@ -1,4 +1,8 @@
-import { deleteProblem, getProblemById } from "@/repository/problem.repository";
+import {
+  deleteProblem,
+  getProblemById,
+  editProblem,
+} from "@/repository/problem.repository";
 
 export async function GET(
   req: Request,
@@ -62,6 +66,55 @@ export async function DELETE(
   } catch (error) {
     console.error("Error deleting problem:", error);
     return new Response(JSON.stringify({ error: "Failed to delete problem" }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+}
+
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    params = await params;
+    const body = await req.json();
+    const { title, description } = body;
+
+    if (!title || !description) {
+      return new Response(
+        JSON.stringify({ error: "Title and description are required" }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    const updatedProblem = await editProblem(params.id, { title, description });
+
+    if (!updatedProblem) {
+      return new Response(JSON.stringify({ error: "Problem not found" }), {
+        status: 404,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
+    return new Response(JSON.stringify(updatedProblem), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error("Error updating problem:", error);
+    return new Response(JSON.stringify({ error: "Failed to update problem" }), {
       status: 500,
       headers: {
         "Content-Type": "application/json",

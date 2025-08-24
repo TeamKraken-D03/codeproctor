@@ -142,6 +142,10 @@ export const createColumns = (
         }
       }
 
+      async function handleEdit() {
+        router.push(`/problems/${row.original.id}/edit`);
+      }
+
       return (
         <>
           <DropdownMenu>
@@ -161,6 +165,9 @@ export const createColumns = (
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleView}>
                 View Problem
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleEdit}>
+                Edit
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDelete}>
                 Delete
