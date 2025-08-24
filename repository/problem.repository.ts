@@ -9,11 +9,17 @@ export interface createProblem {
   problemid: string;
   title: string;
   description: string;
+  created_by?: string | null;
 }
 
 export async function getAllProblems() {
   try {
-    const problems = await sql`SELECT * FROM problems`;
+    // Join with users table to get the creator's name
+    const problems = await sql`
+      SELECT p.*, u.name as creator_name
+      FROM problems p
+      LEFT JOIN users u ON p.created_by = u.id
+    `;
     return problems;
   } catch (error) {
     console.error("Error getting all problems:", error);
@@ -83,8 +89,24 @@ export async function getProblemsWithPagination(
 
 export async function createProblem(newProblem: createProblem) {
   try {
-    const result =
-      await sql`INSERT INTO problems (id, title, description) VALUES (${newProblem.problemid},${newProblem.title}, ${newProblem.description}) RETURNING *`;
+    let result;
+    
+    // Check if created_by is provided
+    if (newProblem.created_by) {
+      result = await sql`
+        INSERT INTO problems (id, title, description, created_by) 
+        VALUES (${newProblem.problemid}, ${newProblem.title}, ${newProblem.description}, ${newProblem.created_by}) 
+        RETURNING *
+      `;
+    } else {
+      // If no created_by is provided, insert with NULL
+      result = await sql`
+        INSERT INTO problems (id, title, description) 
+        VALUES (${newProblem.problemid}, ${newProblem.title}, ${newProblem.description}) 
+        RETURNING *
+      `;
+    }
+    
     return result[0];
   } catch (error) {
     console.error("Error creating problem:", error);

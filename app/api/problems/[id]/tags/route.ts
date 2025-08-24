@@ -33,7 +33,7 @@ export async function GET(
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     params = await params;
@@ -48,7 +48,11 @@ export async function POST(
       });
     }
 
-    const res = await addTagToProblem(params.id, tagId);
+    // Await the entire params object before accessing its properties
+    const params = await context.params;
+    const id = params.id;
+    
+    const res = await addTagToProblem(id, tagId);
     return new Response(
       JSON.stringify({
         message: "Tag added to problem successfully",

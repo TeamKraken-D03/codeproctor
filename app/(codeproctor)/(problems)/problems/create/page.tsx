@@ -50,6 +50,7 @@ export interface CreateProblem {
   problemid: string;
   title: string;
   description: string;
+  created_by?: string; // Optional here as it will be set in the API
 }
 
 export default function Page() {
@@ -140,6 +141,7 @@ export default function Page() {
         problemid: newProblemId,
         title: title.trim(),
         description: description.trim(),
+        // created_by will be populated from the session in the API
       };
 
       const problemRes = await fetch("/api/problems", {

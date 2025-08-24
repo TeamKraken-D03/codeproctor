@@ -6,11 +6,14 @@ import {
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    params = await params;
-    const problem = await getProblemById(params.id);
+    // Await the entire params object before accessing its properties
+    const params = await context.params;
+    const id = params.id;
+    
+    const problem = await getProblemById(id);
 
     if (!problem) {
       return new Response(JSON.stringify({ error: "Problem not found" }), {
@@ -40,10 +43,14 @@ export async function GET(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const result = await deleteProblem(params.id);
+    // Await the entire params object before accessing its properties
+    const params = await context.params;
+    const id = params.id;
+    
+    const result = await deleteProblem(id);
 
     if (!result) {
       return new Response(JSON.stringify({ error: "Problem not found" }), {

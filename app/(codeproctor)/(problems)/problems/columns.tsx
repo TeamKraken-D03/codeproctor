@@ -97,7 +97,7 @@ export const createColumns = (
     },
   },
   {
-    accessorKey: "created_by",
+    accessorKey: "creator_name",
     header: ({ column }) => {
       return (
         <Button
@@ -108,6 +108,10 @@ export const createColumns = (
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      const creatorName = row.getValue("creator_name") as string;
+      return creatorName || "Unknown";
     },
   },
   {

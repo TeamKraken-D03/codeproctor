@@ -51,4 +51,5 @@ export type problem = {
   title: string;
   description: string;
   created_by?: string;
+  creator_name?: string;
 };
