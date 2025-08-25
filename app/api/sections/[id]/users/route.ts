@@ -27,7 +27,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const sectionId = params.id;
+  const sectionId = await params.id;
   const { userId } = await request.json();
   
   try {
