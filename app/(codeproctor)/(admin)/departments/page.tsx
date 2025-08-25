@@ -218,7 +218,6 @@ export default function DepartmentsPage() {
         />
       </div>
 
-      {/* Edit Department Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

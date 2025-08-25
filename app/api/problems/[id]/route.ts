@@ -43,7 +43,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const result = await deleteProblem(params.id);
+    const problemid = await params.id;
+    const result = await deleteProblem(problemid);
 
     if (!result) {
       return new Response(JSON.stringify({ error: "Problem not found" }), {

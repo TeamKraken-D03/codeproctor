@@ -11,7 +11,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
-import { useState } from "react";
 
 export const createDepartmentColumns = (
   refetchData: () => Promise<void>,
@@ -71,8 +70,6 @@ export const createDepartmentColumns = (
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const [isDialogOpen, setIsDialogOpen] = useState(false);
-
       const handleDeleteDepartment = async () => {
         if (confirm(`Are you sure you want to delete the department "${row.original.name}"?`)) {
           try {
@@ -95,10 +92,6 @@ export const createDepartmentColumns = (
 
       const handleEditDepartment = () => {
         openEditDialog(row.original);
-      };
-
-      const handleAssignRole = () => {
-        setIsDialogOpen(true);
       };
 
       return (

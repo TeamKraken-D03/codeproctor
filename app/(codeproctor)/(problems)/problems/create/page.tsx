@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -50,6 +51,7 @@ export interface CreateProblem {
   problemid: string;
   title: string;
   description: string;
+  created_by?: string;
 }
 
 export default function Page() {
@@ -68,6 +70,7 @@ export default function Page() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const router = useRouter();
+  const {data: session} = useSession();
 
   useEffect(() => {
     fetchTags();
@@ -140,6 +143,7 @@ export default function Page() {
         problemid: newProblemId,
         title: title.trim(),
         description: description.trim(),
+        created_by: session?.user?.id,
       };
 
       const problemRes = await fetch("/api/problems", {
