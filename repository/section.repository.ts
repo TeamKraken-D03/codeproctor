@@ -22,7 +22,7 @@ export async function getUnassignedUsers(sectionid: string) {
     const users = await sql`
       SELECT u.* FROM users u
       WHERE u.id NOT IN (
-        SELECT su.userid FROM sections_users su WHERE su.sectionid = ${sectionid}
+        SELECT su.userid FROM sections_users su
       )
     `;
     return { status: true, data: users };
