@@ -36,14 +36,14 @@ export default function Page() {
   const [globalFilter, setGlobalFilter] = useState("");
   const [totalRows, setTotalRows] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  
+
   const [openDialog, setOpenDialog] = useState(false);
   const [departments, setDepartments] = useState<department[]>([]);
   const [semesters, setSemesters] = useState<semester[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedSemester, setSelectedSemester] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
-  
+
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editSection, setEditSection] = useState<any>(null);
   const [editLoading, setEditLoading] = useState(false);
@@ -57,7 +57,7 @@ export default function Page() {
     try {
       const sortBy = sorting.length > 0 ? sorting[0].id : "section_name";
       const sortOrder = sorting.length > 0 && sorting[0].desc ? "desc" : "asc";
-      
+
       const params = new URLSearchParams({
         page: (pagination.pageIndex + 1).toString(),
         pageSize: pagination.pageSize.toString(),
@@ -71,7 +71,7 @@ export default function Page() {
       if (!response.ok) {
         throw new Error("Failed to fetch sections");
       }
-      
+
       const res = await response.json();
       setSections(res.data);
       setTotalRows(res.total);
@@ -85,16 +85,19 @@ export default function Page() {
     }
   }
 
+  async function getSectionSemester() {
+    const [departmentData, semesterData] = await Promise.all([
+      fetch("/api/departments/all").then((res) => res.json()),
+      fetch("/api/semesters/all").then((res) => res.json()),
+    ]);
+    setDepartments(departmentData.data);
+    setSemesters(semesterData.data);
+  }
+
   async function handleDialogOpen() {
     try {
       setOpenDialog(true);
-
-      const [departmentData, semesterData] = await Promise.all([
-        fetch("/api/departments/all").then((res) => res.json()),
-        fetch("/api/semesters/all").then((res) => res.json()),
-      ]);
-      setDepartments(departmentData.data);
-      setSemesters(semesterData.data);
+      getSectionSemester();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -130,7 +133,11 @@ export default function Page() {
   }
 
   async function handleEditSection(): Promise<void> {
-    if (!editSection?.section_name.trim() || !editSection?.departmentid || !editSection?.semesterid) {
+    if (
+      !editSection?.section_name.trim() ||
+      !editSection?.departmentid ||
+      !editSection?.semesterid
+    ) {
       alert("Please fill in all required fields");
       return;
     }
@@ -168,6 +175,7 @@ export default function Page() {
   }
 
   function openEditDialog(section: any): void {
+    getSectionSemester();
     setEditSection({ ...section });
     setIsEditDialogOpen(true);
   }
@@ -283,7 +291,9 @@ export default function Page() {
               <Select
                 value={editSection?.section_name || ""}
                 onValueChange={(value) =>
-                  setEditSection((prev: any) => prev ? { ...prev, section_name: value } : null)
+                  setEditSection((prev: any) =>
+                    prev ? { ...prev, section_name: value } : null
+                  )
                 }
               >
                 <SelectTrigger className="col-span-3">
@@ -304,7 +314,9 @@ export default function Page() {
               <Select
                 value={editSection?.departmentid || ""}
                 onValueChange={(value) =>
-                  setEditSection((prev: any) => prev ? { ...prev, departmentid: value } : null)
+                  setEditSection((prev: any) =>
+                    prev ? { ...prev, departmentid: value } : null
+                  )
                 }
               >
                 <SelectTrigger className="col-span-3">
@@ -326,7 +338,9 @@ export default function Page() {
               <Select
                 value={editSection?.semesterid || ""}
                 onValueChange={(value) =>
-                  setEditSection((prev: any) => prev ? { ...prev, semesterid: value } : null)
+                  setEditSection((prev: any) =>
+                    prev ? { ...prev, semesterid: value } : null
+                  )
                 }
               >
                 <SelectTrigger className="col-span-3">
