@@ -157,7 +157,7 @@ export default function DepartmentsPage() {
             <DialogHeader>
               <DialogTitle>Create New Department</DialogTitle>
               <DialogDescription>
-                Add a new department to the system. Click save when you're done.
+                {`Add a new department to the system. Click save when you're done.`}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -223,7 +223,7 @@ export default function DepartmentsPage() {
           <DialogHeader>
             <DialogTitle>Edit Department</DialogTitle>
             <DialogDescription>
-              Update the department information. Click save when you're done.
+              {`Update the department information. Click save when you're done.`}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

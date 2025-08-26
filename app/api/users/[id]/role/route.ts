@@ -1,4 +1,3 @@
-import sql from "@/lib/db";
 import { assignRoleToUser } from "@/repository/user.repository";
 import { NextRequest, NextResponse } from "next/server";
 

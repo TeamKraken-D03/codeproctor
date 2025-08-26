@@ -48,9 +48,9 @@ export async function POST(req: Request) {
         headers: { "Content-Type": "application/json" },
       });
     }
-  } catch (e: Error | any) {
+  } catch (e: unknown) {
     return new Response(
-      JSON.stringify({ error: e.message || "Internal server error" }),
+      JSON.stringify({ error: (e as Error).message || "Internal server error" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -87,9 +87,9 @@ export async function DELETE(req: Request) {
         headers: { "Content-Type": "application/json" },
       });
     }
-  } catch (e: Error | any) {
+  } catch (e: unknown) {
     return new Response(
-      JSON.stringify({ error: e.message || "Internal server error" }),
+      JSON.stringify({ error: (e as Error).message || "Internal server error" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -114,9 +114,9 @@ export async function PUT(req: Request) {
         headers: { "Content-Type": "application/json" },
       });
     }
-  } catch (e: Error | any) {
+  } catch (e: unknown) {
     return new Response(
-      JSON.stringify({ error: e.message || "Internal server error" }),
+      JSON.stringify({ error: (e as Error).message || "Internal server error" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },

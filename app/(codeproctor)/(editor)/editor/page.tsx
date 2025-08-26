@@ -3,14 +3,10 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuContent, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import Editor from "@monaco-editor/react";
-import { ArrowBigDownIcon, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 export default function editor() {

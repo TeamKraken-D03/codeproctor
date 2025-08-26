@@ -1,11 +1,9 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { Shield, Users, Code } from "lucide-react";
+import { Shield } from "lucide-react";
 import { ActionButtons } from "@/components/action-buttons";
 
 export function HeroContent() {
-  const { data: session } = useSession();
 
   return (
     <main className="container mx-auto px-4">

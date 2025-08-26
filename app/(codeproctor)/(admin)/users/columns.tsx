@@ -121,7 +121,7 @@ export const createColumns = (
       };
 
       async function assignRole(row: user, newRole: string) {
-        const res = await fetch(`/api/users/${row.id}/role`, {
+        await fetch(`/api/users/${row.id}/role`, {
           method: "POST",
           headers: {
             "content-Type": "application/json",
@@ -151,10 +151,10 @@ export const createColumns = (
               <DropdownMenuItem onClick={handleAssignRole}>
                 Assign Role
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleAssignRole}>
+              <DropdownMenuItem disabled>
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleAssignRole}>
+              <DropdownMenuItem disabled>
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

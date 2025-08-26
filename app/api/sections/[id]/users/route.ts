@@ -19,6 +19,7 @@ export async function GET(
       return Response.json(assignedUsers);
     }
   } catch (error) {
+    console.log(error);
     return Response.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 }

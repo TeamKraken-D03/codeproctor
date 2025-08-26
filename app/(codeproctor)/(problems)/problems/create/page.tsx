@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -69,7 +69,6 @@ export default function Page() {
   const [isCreatingTestcase, setIsCreatingTestcase] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const router = useRouter();
   const {data: session} = useSession();
 
   useEffect(() => {

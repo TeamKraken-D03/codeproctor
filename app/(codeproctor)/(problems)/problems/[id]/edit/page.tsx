@@ -28,7 +28,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface Tag {
   id: string;
@@ -73,41 +73,31 @@ export default function EditProblemPage() {
   const { id } = useParams();
   const router = useRouter();
 
-  useEffect(() => {
-    if (id) {
-      fetchProblem();
-      fetchTags();
-      fetchProblemTags();
-      fetchTestCases();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    console.log("Test cases state updated:", testcases);
-  }, [testcases]);
-
-  async function fetchProblem() {
-    setIsLoading(true);
-    try {
-      const res = await fetch(`/api/problems/${id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setProblem(data);
-        setTitle(data.title);
-        setDescription(data.description);
-      } else {
-        console.error("Failed to fetch problem");
+  const fetchProblem = useCallback(
+    async function () {
+      setIsLoading(true);
+      try {
+        const res = await fetch(`/api/problems/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setProblem(data);
+          setTitle(data.title);
+          setDescription(data.description);
+        } else {
+          console.error("Failed to fetch problem");
+          router.push("/problems");
+        }
+      } catch (error) {
+        console.error("Failed to fetch problem:", error);
         router.push("/problems");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch problem:", error);
-      router.push("/problems");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    },
+    [id, router]
+  );
 
-  async function fetchTags() {
+  const fetchTags = useCallback(async function () {
     try {
       const res = await fetch("/api/problems/tags");
       if (res.ok) {
@@ -117,42 +107,48 @@ export default function EditProblemPage() {
     } catch (error) {
       console.error("Failed to fetch tags:", error);
     }
-  }
+  }, []);
 
-  async function fetchProblemTags() {
-    try {
-      const res = await fetch(`/api/problems/${id}/tags`);
-      if (res.ok) {
-        const data = await res.json();
-        setProblemTags(data);
-        if (data.length > 0) {
-          setSelectedTag(data[0].id);
-        } else {
-          setSelectedTag("no-tag");
+  const fetchProblemTags = useCallback(
+    async function () {
+      try {
+        const res = await fetch(`/api/problems/${id}/tags`);
+        if (res.ok) {
+          const data = await res.json();
+          setProblemTags(data);
+          if (data.length > 0) {
+            setSelectedTag(data[0].id);
+          } else {
+            setSelectedTag("no-tag");
+          }
         }
+      } catch (error) {
+        console.error("Failed to fetch problem tags:", error);
       }
-    } catch (error) {
-      console.error("Failed to fetch problem tags:", error);
-    }
-  }
+    },
+    [id]
+  );
 
-  async function fetchTestCases() {
-    try {
-      console.log("Fetching test cases for problem:", id);
-      const res = await fetch(`/api/problems/${id}/testcases`);
-      if (res.ok) {
-        const data = await res.json();
-        console.log("Test cases fetched:", data);
-        setTestCases(data);
-      } else {
-        console.error("Failed to fetch test cases. Status:", res.status);
-        const errorText = await res.text();
-        console.error("Error response:", errorText);
+  const fetchTestCases = useCallback(
+    async function () {
+      try {
+        console.log("Fetching test cases for problem:", id);
+        const res = await fetch(`/api/problems/${id}/testcases`);
+        if (res.ok) {
+          const data = await res.json();
+          console.log("Test cases fetched:", data);
+          setTestCases(data);
+        } else {
+          console.error("Failed to fetch test cases. Status:", res.status);
+          const errorText = await res.text();
+          console.error("Error response:", errorText);
+        }
+      } catch (error) {
+        console.error("Failed to fetch test cases:", error);
       }
-    } catch (error) {
-      console.error("Failed to fetch test cases:", error);
-    }
-  }
+    },
+    [id]
+  );
 
   function resetTestcaseForm() {
     setTestcaseName("");
@@ -315,6 +311,19 @@ export default function EditProblemPage() {
       alert("Failed to delete test case");
     }
   }
+
+  useEffect(() => {
+    if (id) {
+      fetchProblem();
+      fetchTags();
+      fetchProblemTags();
+      fetchTestCases();
+    }
+  }, [id, fetchProblem, fetchTags, fetchProblemTags, fetchTestCases]);
+
+  useEffect(() => {
+    console.log("Test cases state updated:", testcases);
+  }, [testcases]);
 
   if (isLoading) {
     return (

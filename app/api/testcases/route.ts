@@ -1,9 +1,4 @@
-import { createAndAssignTestcase, createTestCase, getAllTestCases } from "@/repository/testcases.repository";
-
-interface createTestCaseDTO {
-    input: string
-    output: string
-}
+import { getAllTestCases } from "@/repository/testcases.repository";
 
 export async function GET(){
     const testcases = await getAllTestCases();

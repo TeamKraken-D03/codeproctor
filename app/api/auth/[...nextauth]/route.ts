@@ -15,7 +15,7 @@ const handler = NextAuth({
     maxAge: 1 * 24 * 60 * 60, // 1 day
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       try {
         if (!user.email) {
           return false;
@@ -62,7 +62,7 @@ const handler = NextAuth({
     async session({ session, token }) {
       if (token.userId) {
         session.user.id = token.userId ?? "";
-        (session.user as any).role = token.userRole ?? "learner";
+        session.user.role = token.userRole ?? "learner";
       }
       return session;
     },

@@ -180,7 +180,7 @@ export const createColumns = (
               <DialogHeader>
                 <DialogTitle>Delete Problem</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to delete "{row.original.title}"? This action cannot be undone.
+                  {`Are you sure you want to delete "{row.original.title}"? This action cannot be undone.`}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex justify-end space-x-2">

@@ -35,8 +35,7 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  searchColumn?: string; // Optional — which column to filter
-  // Server-side props
+  searchColumn?: string; 
   manualPagination?: boolean;
   manualSorting?: boolean;
   manualFiltering?: boolean;

@@ -18,12 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { department, semester, section } from "@/types/types";
+import { department, semester } from "@/types/types";
 import { createSectionType } from "@/repository/section.repository";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
 
 export default function Page() {
   const [sections, setSections] = useState([]);
@@ -280,7 +278,7 @@ export default function Page() {
           <DialogHeader>
             <DialogTitle>Edit Section</DialogTitle>
             <DialogDescription>
-              Update the section information. Click save when you're done.
+              {`Update the section information. Click save when you're done.`}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

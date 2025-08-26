@@ -70,7 +70,7 @@ export default function SectionUsersPage() {
 							</tr>
 						</thead>
 						<tbody>
-							{assignedUsers.map((user: any) => (
+							{assignedUsers.map((user: {id: string, name: string}) => (
 								<tr key={user.id}>
 									<td className="border px-2 py-1">{user.id}</td>
 									<td className="border px-2 py-1">{user.name}</td>

@@ -161,7 +161,7 @@ export default function SemestersPage() {
             <DialogHeader>
               <DialogTitle>Create New Semester</DialogTitle>
               <DialogDescription>
-                Add a new semester to the system. Click save when you're done.
+                {`Add a new semester to the system. Click save when you're done.`}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -240,7 +240,7 @@ export default function SemestersPage() {
           <DialogHeader>
             <DialogTitle>Edit Semester</DialogTitle>
             <DialogDescription>
-              Update the semester information. Click save when you're done.
+              {`Update the semester information. Click save when you're done.`}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
