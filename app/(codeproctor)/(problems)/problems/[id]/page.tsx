@@ -20,7 +20,7 @@ import { Switch } from "@/components/ui/switch";
 export default function Page() {
   const { id } = useParams();
   const [problem, setProblem] = useState<problem>({} as problem);
-  const [language, setLanguage] = useState<string>("JavaScript");
+  const [language, setLanguage] = useState<string>("javascript");
   const [switchState, setSwitchState] = useState<boolean>(false);
   const [code, setCode] = useState<string>("");
   const [languageCode, setLanguageCode] = useState<number>(63);
@@ -308,7 +308,6 @@ int main() {
               <Editor
                 height="60vh"
                 language={language}
-                defaultValue="// Write your solution here..."
                 theme="vs-dark"
                 value={code || getDefaultCode(language)}
                 options={{
