@@ -21,9 +21,21 @@ import { useState, useEffect } from "react";
 
 export default function editor() {
   const [language, setLanguage] = useState<string>("javascript");
-  const [languageCode, setLanguageCode] = useState(102);
+  const [languageCode, setLanguageCode] = useState(63); // Node.js JavaScript (default)
   const [output, setOutput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Language mapping for Monaco Editor
+  const getMonacoLanguage = (lang: string): string => {
+    switch (lang) {
+      case "c++": return "cpp";
+      case "c": return "c";
+      case "python": return "python";
+      case "java": return "java";
+      case "javascript": return "javascript";
+      default: return "javascript";
+    }
+  };
 
   // Language-specific default code templates
   const getDefaultCode = (lang: string): string => {
@@ -44,11 +56,22 @@ if __name__ == "__main__":
 function solution() {
     // Write your solution here
     
-}
-
-// Test your solution
-console.log(solution());`;
+}`;
       
+      case "java":
+        return `// Java Solution
+public class Main {
+    public static void main(String[] args) {
+        Main sol = new Main();
+        // Test your solution
+        System.out.println(sol.solve());
+    }
+    
+    public int solve() {
+        // Write your solution here
+        return 0;
+    }
+}`;
       
       case "c++":
         return `// C++ Solution
@@ -150,31 +173,39 @@ int main() {
               <DropdownMenuCheckboxItem
                 onClick={() => {
                   setLanguage("python");
-                  setLanguageCode(109);
+                  setLanguageCode(71); // Python 3
                 }}
               >
                 Python
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 onClick={() => {
-                  setLanguage("c++");
-                  setLanguageCode(54);
-                }}
-              >
-                C++
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                onClick={() => {
                   setLanguage("javascript");
-                  setLanguageCode(78);
+                  setLanguageCode(63); // Node.js JavaScript
                 }}
               >
                 JavaScript
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 onClick={() => {
+                  setLanguage("java");
+                  setLanguageCode(62); // Java 13
+                }}
+              >
+                Java
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                onClick={() => {
+                  setLanguage("c++");
+                  setLanguageCode(54); // C++ (GCC 9.2.0)
+                }}
+              >
+                C++
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                onClick={() => {
                   setLanguage("c");
-                  setLanguageCode(50);
+                  setLanguageCode(50); // C (GCC 9.2.0)
                 }}
               >
                 C
@@ -191,9 +222,8 @@ int main() {
           <Editor
             key={language} // Force re-render when language changes
             height="80vh"
-            language={language}
+            language={getMonacoLanguage(language)}
             value={code}
-            defaultLanguage="javascript"
             theme="vs-dark"
             options={{
               padding: { top: 20, bottom: 20 },

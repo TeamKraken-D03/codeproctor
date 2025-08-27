@@ -25,6 +25,7 @@ export default function Page() {
       case "cpp": return "cpp";
       case "c": return "c";
       case "python": return "python";
+      case "java": return "java";
       case "javascript": return "javascript";
       default: return "javascript";
     }
@@ -49,10 +50,22 @@ if __name__ == "__main__":
 function solution() {
     // Write your solution here
     
-}
-
-// Test your solution
-console.log(solution());`;
+}`;
+      
+      case "java":
+        return `// Java Solution
+public class Main {
+    public static void main(String[] args) {
+        Main sol = new Main();
+        // Test your solution
+        System.out.println(sol.solve());
+    }
+    
+    public int solve() {
+        // Write your solution here
+        return 0;
+    }
+}`;
       
       case "cpp":
         return `// C++ Solution
@@ -179,6 +192,14 @@ int main() {
                     }}
                   >
                     JavaScript
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      console.log("Setting language to java");
+                      setLanguage("java");
+                    }}
+                  >
+                    Java
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
