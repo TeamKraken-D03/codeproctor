@@ -17,14 +17,89 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Editor from "@monaco-editor/react";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function editor() {
   const [language, setLanguage] = useState<string>("javascript");
   const [languageCode, setLanguageCode] = useState(102);
   const [output, setOutput] = useState<string>("");
-  const [code, setCode] = useState<string>("// Write your code here\n");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Language-specific default code templates
+  const getDefaultCode = (lang: string): string => {
+    switch (lang) {
+      case "python":
+        return `# Python Solution
+def solution():
+    # Write your solution here
+    pass
+
+# Test your solution
+if __name__ == "__main__":
+    result = solution()
+    print(result)`;
+      
+      case "javascript":
+        return `// JavaScript Solution
+function solution() {
+    // Write your solution here
+    
+}
+
+// Test your solution
+console.log(solution());`;
+      
+      
+      case "c++":
+        return `// C++ Solution
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class Solution {
+public:
+    int solve() {
+        // Write your solution here
+        return 0;
+    }
+};
+
+int main() {
+    Solution sol;
+    // Test your solution
+    cout << sol.solve() << endl;
+    return 0;
+}`;
+      
+      case "c":
+        return `// C Solution
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int solve() {
+    // Write your solution here
+    return 0;
+}
+
+int main() {
+    // Test your solution
+    printf("%d\\n", solve());
+    return 0;
+}`;
+      
+      default:
+        return "// Write your solution here...";
+    }
+  };
+
+  const [code, setCode] = useState<string>(getDefaultCode("javascript"));
+
+  // Update code when language changes
+  useEffect(() => {
+    setCode(getDefaultCode(language));
+  }, [language]);
 
   async function handleClick() {
     setIsLoading(true);
@@ -78,7 +153,7 @@ export default function editor() {
                   setLanguageCode(109);
                 }}
               >
-                python
+                Python
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 onClick={() => {
@@ -86,7 +161,7 @@ export default function editor() {
                   setLanguageCode(54);
                 }}
               >
-                c++
+                C++
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 onClick={() => {
@@ -94,15 +169,15 @@ export default function editor() {
                   setLanguageCode(78);
                 }}
               >
-                javascript
+                JavaScript
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 onClick={() => {
                   setLanguage("c");
-                  setLanguageCode(54);
+                  setLanguageCode(50);
                 }}
               >
-                c
+                C
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -114,9 +189,10 @@ export default function editor() {
       <div className="flex h-screen gap-4">
         <div className="w-1/2">
           <Editor
+            key={language} // Force re-render when language changes
             height="80vh"
             language={language}
-            defaultValue={code}
+            value={code}
             defaultLanguage="javascript"
             theme="vs-dark"
             options={{

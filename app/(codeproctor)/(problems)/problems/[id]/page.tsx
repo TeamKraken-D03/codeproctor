@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
+  DropdownMenuItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -19,6 +19,85 @@ export default function Page() {
   const [problem, setProblem] = useState<problem>({} as problem);
   const [language, setLanguage] = useState<string>("javascript");
 
+  // Language mapping for Monaco Editor
+  const getMonacoLanguage = (lang: string): string => {
+    switch (lang) {
+      case "cpp": return "cpp";
+      case "c": return "c";
+      case "python": return "python";
+      case "javascript": return "javascript";
+      default: return "javascript";
+    }
+  };
+
+  // Language-specific default code templates
+  const getDefaultCode = (lang: string): string => {
+    switch (lang) {
+      case "python":
+        return `# Python Solution
+def solution():
+    # Write your solution here
+    pass
+
+# Test your solution
+if __name__ == "__main__":
+    result = solution()
+    print(result)`;
+      
+      case "javascript":
+        return `// JavaScript Solution
+function solution() {
+    // Write your solution here
+    
+}
+
+// Test your solution
+console.log(solution());`;
+      
+      case "cpp":
+        return `// C++ Solution
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class Solution {
+public:
+    int solve() {
+        // Write your solution here
+        return 0;
+    }
+};
+
+int main() {
+    Solution sol;
+    // Test your solution
+    cout << sol.solve() << endl;
+    return 0;
+}`;
+      
+      case "c":
+        return `// C Solution
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int solve() {
+    // Write your solution here
+    return 0;
+}
+
+int main() {
+    // Test your solution
+    printf("%d\\n", solve());
+    return 0;
+}`;
+      
+      default:
+        return "// Write your solution here...";
+    }
+  };
+
   useEffect(() => {
     const fetchProblem = async () => {
       const res = await fetch(`/api/problems/${id}`);
@@ -29,6 +108,12 @@ export default function Page() {
     };
     fetchProblem();
   }, [id]);
+
+  // Debug language changes
+  useEffect(() => {
+    console.log("Language changed to:", language);
+    console.log("Default code for", language, ":", getDefaultCode(language).substring(0, 50) + "...");
+  }, [language]);
 
   return (
     <div className="flex flex-col">
@@ -79,36 +164,38 @@ export default function Page() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "python"}
-                    onCheckedChange={() => setLanguage("python")}
+                  <DropdownMenuItem
+                    onClick={() => {
+                      console.log("Setting language to python");
+                      setLanguage("python");
+                    }}
                   >
                     Python
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "javascript"}
-                    onCheckedChange={() => setLanguage("javascript")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      console.log("Setting language to javascript");
+                      setLanguage("javascript");
+                    }}
                   >
                     JavaScript
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "java"}
-                    onCheckedChange={() => setLanguage("java")}
-                  >
-                    Java
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "cpp"}
-                    onCheckedChange={() => setLanguage("cpp")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      console.log("Setting language to cpp");
+                      setLanguage("cpp");
+                    }}
                   >
                     C++
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "c"}
-                    onCheckedChange={() => setLanguage("c")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      console.log("Setting language to c");
+                      setLanguage("c");
+                    }}
                   >
                     C
-                  </DropdownMenuCheckboxItem>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="default">Run</Button>
@@ -117,9 +204,10 @@ export default function Page() {
 
           <div className="rounded-lg border overflow-hidden flex-1">
             <Editor
+              key={language} // Force re-render when language changes
               height="80vh"
-              language={language}
-              defaultValue="// Write your solution here..."
+              language={getMonacoLanguage(language)}
+              defaultValue={getDefaultCode(language)}
               theme="vs-dark"
               options={{
                 padding: { top: 20, bottom: 20 },
