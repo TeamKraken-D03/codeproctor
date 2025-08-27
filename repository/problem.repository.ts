@@ -27,9 +27,10 @@ export async function getProblemsWithPagination(
   pageSize: number,
   search: string,
   sortBy: string,
-  sortOrder: string
+  sortOrder: string,
+  userId: string
 ) {
-  try {
+  try {    
     const offset = (page - 1) * pageSize;
 
     const allowedSortColumns = ["id", "title", "description", "created_at"];
@@ -42,9 +43,10 @@ export async function getProblemsWithPagination(
       const searchPattern = `%${search}%`;
 
       problems = await sql`
-        SELECT p.id, p.title, p.description, p.created_at, u.name AS created_by
+        SELECT p.id, p.title, p.description, p.created_at, u.name AS created_by, up.is_completed
         FROM problems p INNER JOIN users u ON p.created_by = u.id
-        WHERE p.title ILIKE ${searchPattern} OR p.description ILIKE ${searchPattern} OR p.id::text ILIKE ${searchPattern}
+        LEFT JOIN problems_users up ON p.id = up.problemid AND up.userid = ${userId}
+        WHERE p.title ILIKE ${searchPattern} OR p.description ILIKE ${searchPattern} OR p.id::text ILIKE ${searchPattern} OR up.is_completed::text ILIKE ${searchPattern}
         ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
         LIMIT ${pageSize} OFFSET ${offset}
       `;
@@ -55,8 +57,9 @@ export async function getProblemsWithPagination(
       `;
     } else {
       problems = await sql`
-        SELECT p.id, p.title, p.description, p.created_at, u.name AS created_by
+        SELECT p.id, p.title, p.description, p.created_at, u.name AS created_by, up.is_completed
         FROM problems p INNER JOIN users u ON p.created_by = u.id
+        LEFT JOIN problems_users up ON p.id = up.problemid AND up.userid = ${userId}
         ORDER BY ${sql.unsafe(safeSortBy)} ${sql.unsafe(safeSortOrder)}
         LIMIT ${pageSize} OFFSET ${offset}
       `;
@@ -133,3 +136,23 @@ export async function editProblem(
     throw error;
   }
 }
+
+export async function MarkProblemCompletedUser(
+  userId: string,
+  problemId: string,
+  isCompleted: string,
+) {
+  await sql`INSERT INTO problems_users (userid, problemid, is_completed) 
+  VALUES (${userId}, ${problemId}, ${isCompleted})
+  ON CONFLICT (userid, problemid)
+  DO UPDATE SET is_completed = ${isCompleted}`;
+}
+
+export async function CheckProblemCompletedUser(
+  userId: string,
+  problemId: string
+) {
+  const result = await sql`SELECT is_completed FROM problems_users WHERE userid = ${userId} AND problemid = ${problemId}`;
+  return result[0]?.is_completed || "unsolved";
+}
+

@@ -20,6 +20,7 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
 
 export const createColumns = (
   refetchData: () => Promise<void>
@@ -109,6 +110,18 @@ export const createColumns = (
         </Button>
       );
     },
+  },
+  {
+    accessorKey: "is_completed",
+    header: "Status",
+    cell:({row}) => {
+      const isCompleted = row.getValue("is_completed") as string;
+      return (
+        <div className="flex items-center">
+          {(isCompleted === "solved") && <Badge variant="outline" className="text-green-500">Solved</Badge>}
+        </div>
+      );
+    }
   },
   {
     id: "actions",

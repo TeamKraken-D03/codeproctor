@@ -1,9 +1,16 @@
+import { requireAuth } from "@/lib/auth-helpers";
 import { createProblem, getProblemsWithPagination } from "@/repository/problem.repository";
+import { getServerSession } from "next-auth";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
+
+    const user = await requireAuth();
+    if (user instanceof Response) {
+      return user;
+    }
     
     const page = parseInt(searchParams.get("page") || "1");
     const pageSize = parseInt(searchParams.get("pageSize") || "10");
@@ -11,7 +18,7 @@ export async function GET(req: NextRequest) {
     const sortBy = searchParams.get("sortBy") || "id";
     const sortOrder = searchParams.get("sortOrder") || "asc";
 
-    const result = await getProblemsWithPagination(page, pageSize, search, sortBy, sortOrder);
+    const result = await getProblemsWithPagination(page, pageSize, search, sortBy, sortOrder, user.id);
 
     return new Response(JSON.stringify(result), {
       status: 200,
