@@ -112,7 +112,7 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center py-4">
         {searchColumn && (
           <Input
-            placeholder={`Search users...`}
+            placeholder={`Search...`}
             value={
               onGlobalFilterChange && state?.globalFilter !== undefined
                 ? state.globalFilter
