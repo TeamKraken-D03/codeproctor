@@ -5,10 +5,10 @@ import {
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  params = await params;
-  const { id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
   const newTestCase = await req.json();
   await createAndAssignTestcase(id, newTestCase);
   return new Response(
@@ -24,10 +24,10 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  params = await params;
-  const { id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
   const testCases = await getTestCasesByProblemId(id);
   return new Response(JSON.stringify(testCases), {
     status: 200,

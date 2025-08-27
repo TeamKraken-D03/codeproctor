@@ -6,11 +6,11 @@ import {
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    params = await params;
-    const problem = await getProblemById(params.id);
+    const {id} = await params;
+    const problem = await getProblemById(id);
 
     if (!problem) {
       return new Response(JSON.stringify({ error: "Problem not found" }), {
@@ -40,11 +40,11 @@ export async function GET(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const problemid = await params.id;
-    const result = await deleteProblem(problemid);
+    const { id } = await params;
+    const result = await deleteProblem(id);
 
     if (!result) {
       return new Response(JSON.stringify({ error: "Problem not found" }), {
@@ -77,10 +77,10 @@ export async function DELETE(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    params = await params;
+    const resolvedParams = await params;
     const body = await req.json();
     const { title, description } = body;
 
@@ -96,7 +96,7 @@ export async function PUT(
       );
     }
 
-    const updatedProblem = await editProblem(params.id, { title, description });
+    const updatedProblem = await editProblem(resolvedParams.id, { title, description });
 
     if (!updatedProblem) {
       return new Response(JSON.stringify({ error: "Problem not found" }), {

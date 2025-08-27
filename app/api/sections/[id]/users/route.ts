@@ -3,9 +3,9 @@ import { getAssignedUsers, getUnassignedUsers, assignUserToSection } from '@/rep
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const sectionId = await params.id;
+  const { id: sectionId } = await params;
   const searchParams = request.nextUrl.searchParams;
   
   const type = searchParams.get('unassigned'); 
@@ -26,9 +26,9 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const sectionId = await params.id;
+  const { id: sectionId } = await params;
   const { userId } = await request.json();
   
   try {

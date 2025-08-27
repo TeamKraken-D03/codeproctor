@@ -6,11 +6,11 @@ import {
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    params = await params;
-    const tags = await getTagsForProblem(params.id);
+    const resolvedParams = await params;
+    const tags = await getTagsForProblem(resolvedParams.id);
     return new Response(JSON.stringify(tags), {
       status: 200,
       headers: {
@@ -33,10 +33,10 @@ export async function GET(
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    params = await params;
+    const resolvedParams = await params;
     const { tagId } = await req.json();
 
     if (!tagId) {
@@ -48,7 +48,7 @@ export async function POST(
       });
     }
 
-    const res = await addTagToProblem(params.id, tagId);
+    const res = await addTagToProblem(resolvedParams.id, tagId);
     return new Response(
       JSON.stringify({
         message: "Tag added to problem successfully",
@@ -77,10 +77,10 @@ export async function POST(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    params = await params;
+    const resolvedParams = await params;
     const { oldTagId, newTagId } = await req.json();
 
     if (!newTagId) {
@@ -94,11 +94,11 @@ export async function PUT(
 
     // Remove old tag if exists
     if (oldTagId) {
-      await removeTagFromProblem(params.id, oldTagId);
+      await removeTagFromProblem(resolvedParams.id, oldTagId);
     }
 
     // Add new tag
-    await addTagToProblem(params.id, newTagId);
+    await addTagToProblem(resolvedParams.id, newTagId);
 
     return new Response(
       JSON.stringify({
@@ -127,10 +127,10 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    params = await params;
+    const resolvedParams = await params;
     const { tagId } = await req.json();
 
     if (!tagId) {
@@ -142,7 +142,7 @@ export async function DELETE(
       });
     }
 
-    await removeTagFromProblem(params.id, tagId);
+    await removeTagFromProblem(resolvedParams.id, tagId);
 
     return new Response(
       JSON.stringify({
