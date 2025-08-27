@@ -14,7 +14,7 @@ export default function SemestersPage() {
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 7,
   });
   const [sorting, setSorting] = useState<any[]>([]);
   const [globalFilter, setGlobalFilter] = useState("");
