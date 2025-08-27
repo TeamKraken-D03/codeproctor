@@ -254,51 +254,46 @@ int main() {
             <div className="flex gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
+                  <Button variant="outline" className="w-30">
                     {language} <ChevronDown />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "python"}
-                    onCheckedChange={() => {
+                  <DropdownMenuItem
+                    onClick={() => {
                       setLanguage("python"), setLanguageCode(71);
                     }}
                   >
                     python
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "javascript"}
-                    onCheckedChange={() => {
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
                       setLanguage("javascript"), setLanguageCode(63);
                     }}
                   >
                     javascript
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "java"}
-                    onCheckedChange={() => {
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
                       setLanguage("java"), setLanguageCode(62);
                     }}
                   >
                     java
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "cpp"}
-                    onCheckedChange={() => {
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
                       setLanguage("cpp"), setLanguageCode(54);
                     }}
                   >
                     cpp
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={language === "c"}
-                    onCheckedChange={() => {
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
                       setLanguage("c"), setLanguageCode(50);
                     }}
                   >
                     C
-                  </DropdownMenuCheckboxItem>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="default" onClick={handleClick}>
