@@ -6,7 +6,7 @@ export default function dashboard() {
       <h1 className="text-3xl font-bold mb-6 text-foreground">Dashboard</h1>
       <div className="rounded-lg border bg-card shadow-sm p-4">
         <p className="text-muted-foreground">
-          Dashboard content coming soon...
+          Dashboard content coming soon...hello
         </p>
       </div>
     </div>
